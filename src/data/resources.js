@@ -1,7 +1,7 @@
 // Path of Exile 1 resources
 const poe1Resources = [
   {
-    id: '2',
+    id: '1',
     title: 'PoEDB',
     description: 'Komplet database og reference',
     url: 'https://poedb.tw',
@@ -11,7 +11,7 @@ const poe1Resources = [
     isDefault: true
   },
   {
-    id: '3',
+    id: '2',
     title: 'Trade Site',
     description: 'Officiel handel og priser',
     url: 'https://pathofexile.com/trade',
@@ -21,7 +21,7 @@ const poe1Resources = [
     isDefault: true
   },
   {
-    id: '4',
+    id: '3',
     title: 'poe.ninja',
     description: 'Økonomisk analyse og trends',
     url: 'https://poe.ninja',
@@ -35,7 +35,7 @@ const poe1Resources = [
 // Path of Exile 2 resources
 const poe2Resources = [
   {
-    id: '5',
+    id: '4',
     title: 'PoE2DB',
     description: 'Database for Path of Exile 2',
     url: 'https://poe2db.tw',
@@ -45,7 +45,7 @@ const poe2Resources = [
     isDefault: true
   },
   {
-    id: '6',
+    id: '5',
     title: 'Maxroll PoE2',
     description: 'Detaljerede guides og builds',
     url: 'https://maxroll.gg/poe2',
@@ -55,7 +55,7 @@ const poe2Resources = [
     isDefault: true
   },
   {
-    id: '7',
+    id: '6',
     title: 'Mobalytics',
     description: 'Build guides og analyser',
     url: 'https://mobalytics.gg/poe-2',
@@ -69,7 +69,7 @@ const poe2Resources = [
 // Programs and tools
 const programResources = [
   {
-    id: '15',
+    id: '7',
     title: 'Awakened PoE Trade',
     description: 'In-game overlay til hurtig handel og priser for PoE1',
     url: 'https://github.com/SnosMe/awakened-poe-trade',
@@ -79,7 +79,7 @@ const programResources = [
     isDefault: true
   },
   {
-    id: '16',
+    id: '8',
     title: 'Exiled Exchange 2',
     description: 'Avanceret trading tool for PoE2',
     url: 'https://github.com/Kvan7/Exiled-Exchange-2',
@@ -89,7 +89,7 @@ const programResources = [
     isDefault: true
   },
   {
-    id: '17',
+    id: '9',
     title: 'Path of Building',
     description: 'Build planning værktøj',
     url: 'https://pathofbuilding.community',
@@ -103,7 +103,7 @@ const programResources = [
 // Community resources
 const communityResources = [
   {
-    id: '8',
+    id: '10',
     title: 'r/PathOfExile',
     description: 'Reddit community og diskussioner',
     url: 'https://reddit.com/r/pathofexile',
@@ -113,7 +113,7 @@ const communityResources = [
     isDefault: true
   },
   {
-    id: '9',
+    id: '11',
     title: 'Official Discord',
     description: 'Live chat og support',
     url: 'https://discord.gg/pathofexile',
@@ -123,7 +123,7 @@ const communityResources = [
     isDefault: true
   },
   {
-    id: '10',
+    id: '12',
     title: 'PoE Wiki',
     description: 'Omfattende reference guide',
     url: 'https://pathofexile.fandom.com',
