@@ -14,6 +14,7 @@ import {
 import { db } from './config'
 
 const BUILDS_COLLECTION = 'builds'
+const RESOURCES_COLLECTION = 'resources'
 
 /**
  * Build Data Model Structure:
@@ -125,4 +126,100 @@ export const updateLastOpened = async (buildId) => {
   } catch (error) {
     return { error: error.message }
   }
+}
+
+/**
+ * Resource Data Model Structure:
+ * {
+ *   id: string (auto-generated document ID)
+ *   userId: string (required - Firebase Auth user ID)
+ *   title: string (required - display name for the resource)
+ *   description: string (required - brief description)
+ *   url: string (required - web URL to the resource)
+ *   icon: string (optional - emoji icon)
+ *   category: string (required - 'Path of Exile 1', 'Path of Exile 2', 'Programs', 'Community')
+ *   type: string (optional - subcategory like 'database', 'trading', etc.)
+ *   isDefault: boolean (always false for user resources)
+ *   createdAt: Timestamp (auto-generated)
+ *   updatedAt: Timestamp (auto-updated on changes)
+ * }
+ */
+
+// Add a new resource
+export const addResource = async (userId, resourceData) => {
+  try {
+    const docRef = await addDoc(collection(db, RESOURCES_COLLECTION), {
+      ...resourceData,
+      userId,
+      isDefault: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    })
+    return { id: docRef.id, error: null }
+  } catch (error) {
+    return { id: null, error: error.message }
+  }
+}
+
+// Update an existing resource
+export const updateResource = async (resourceId, resourceData) => {
+  try {
+    const resourceRef = doc(db, RESOURCES_COLLECTION, resourceId)
+    await updateDoc(resourceRef, {
+      ...resourceData,
+      updatedAt: serverTimestamp()
+    })
+    return { error: null }
+  } catch (error) {
+    return { error: error.message }
+  }
+}
+
+// Delete a resource
+export const deleteResource = async (resourceId) => {
+  try {
+    await deleteDoc(doc(db, RESOURCES_COLLECTION, resourceId))
+    return { error: null }
+  } catch (error) {
+    return { error: error.message }
+  }
+}
+
+// Get all resources for a user
+export const getUserResources = async (userId) => {
+  try {
+    const q = query(
+      collection(db, RESOURCES_COLLECTION),
+      where("userId", "==", userId),
+      orderBy("updatedAt", "desc")
+    )
+    const querySnapshot = await getDocs(q)
+    const resources = []
+    querySnapshot.forEach((doc) => {
+      resources.push({ id: doc.id, ...doc.data() })
+    })
+    return { resources, error: null }
+  } catch (error) {
+    return { resources: [], error: error.message }
+  }
+}
+
+// Listen to real-time updates for user resources
+export const subscribeToUserResources = (userId, callback) => {
+  const q = query(
+    collection(db, RESOURCES_COLLECTION),
+    where("userId", "==", userId),
+    orderBy("updatedAt", "desc")
+  )
+  
+  return onSnapshot(q, (querySnapshot) => {
+    const resources = []
+    querySnapshot.forEach((doc) => {
+      resources.push({ id: doc.id, ...doc.data() })
+    })
+    callback(resources)
+  }, (error) => {
+    console.error("Error listening to resources:", error)
+    callback([])
+  })
 }

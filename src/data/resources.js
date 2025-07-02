@@ -1,5 +1,5 @@
-// Default PoE resources data
-export const defaultResources = [
+// Path of Exile 1 resources
+const poe1Resources = [
   {
     id: '2',
     title: 'PoEDB',
@@ -29,7 +29,11 @@ export const defaultResources = [
     category: 'Path of Exile 1',
     type: 'economy',
     isDefault: true
-  },
+  }
+]
+
+// Path of Exile 2 resources
+const poe2Resources = [
   {
     id: '5',
     title: 'PoE2DB',
@@ -59,7 +63,11 @@ export const defaultResources = [
     category: 'Path of Exile 2',
     type: 'guide',
     isDefault: true
-  },
+  }
+]
+
+// Programs and tools
+const programResources = [
   {
     id: '15',
     title: 'Awakened PoE Trade',
@@ -89,7 +97,11 @@ export const defaultResources = [
     category: 'Programs',
     type: 'tool',
     isDefault: true
-  },
+  }
+]
+
+// Community resources
+const communityResources = [
   {
     id: '8',
     title: 'r/PathOfExile',
@@ -132,6 +144,14 @@ export const defaultResources = [
   }
 ]
 
+// Combined default resources
+export const defaultResources = [
+  ...poe1Resources,
+  ...poe2Resources,
+  ...programResources,
+  ...communityResources
+]
+
 // Category order for display
 export const categoryOrder = [
   'Path of Exile 1',
@@ -139,3 +159,6 @@ export const categoryOrder = [
   'Programs',
   'Community'
 ]
+
+// Export individual categories for easier management
+export { poe1Resources, poe2Resources, programResources, communityResources }

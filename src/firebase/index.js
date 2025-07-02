@@ -14,5 +14,10 @@ export {
   deleteBuild, 
   getUserBuilds, 
   subscribeToUserBuilds, 
-  updateLastOpened 
+  updateLastOpened,
+  addResource,
+  updateResource,
+  deleteResource,
+  getUserResources,
+  subscribeToUserResources
 } from './firestore'

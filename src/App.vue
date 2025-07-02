@@ -96,6 +96,7 @@
           @add-resource="handleAddResource"
           @edit-resource="handleEditResource"
           @hide-resource="handleHideResource"
+          @delete-resource="handleDeleteResource"
           @restore-resources="handleRestoreResources"
         />
       </main>
@@ -109,13 +110,23 @@
       @close="closeModal"
       @saved="handleBuildSaved"
     />
+
+    <!-- Add/Edit Resource Modal -->
+    <ResourceModal 
+      :show="showResourceModal"
+      :editing-resource="editingResource"
+      :user-id="user?.uid || ''"
+      @close="closeResourceModal"
+      @saved="handleResourceSaved"
+    />
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds } from './firebase'
+import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds, subscribeToUserResources, deleteResource } from './firebase'
 import BuildModal from './components/BuildModal.vue'
+import ResourceModal from './components/ResourceModal.vue'
 import Header from './components/Header.vue'
 import Navigation from './components/Navigation.vue'
 import BuildCard from './components/BuildCard.vue'
@@ -125,6 +136,7 @@ export default {
   name: 'App',
   components: {
     BuildModal,
+    ResourceModal,
     Header,
     Navigation,
     BuildCard,
@@ -143,11 +155,14 @@ export default {
     const searchQuery = ref('')
     const showModal = ref(false)
     const editingBuild = ref(null)
+    const showResourceModal = ref(false)
+    const editingResource = ref(null)
     const customResources = ref([])
     const hiddenResourceIds = ref([])
     
     let unsubscribeAuth = null
     let unsubscribeBuilds = null
+    let unsubscribeResources = null
 
     // Authentication methods
     const handleGoogleSignIn = async () => {
@@ -247,17 +262,55 @@ export default {
 
     const formatLastOpened = (timestamp) => {
       if (!timestamp) return 'Aldrig'
-      // This is a simplified format - in real app you'd use a proper date library
-      return 'Nyligt'
+      
+      const now = new Date()
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
+      const diffMs = now - date
+      const diffMinutes = Math.floor(diffMs / (1000 * 60))
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+      
+      if (diffMinutes < 1) return 'Lige nu'
+      if (diffMinutes < 60) return `${diffMinutes} minut${diffMinutes === 1 ? '' : 'ter'} siden`
+      if (diffHours < 24) return `${diffHours} time${diffHours === 1 ? '' : 'r'} siden`
+      if (diffDays < 30) return `${diffDays} dag${diffDays === 1 ? '' : 'e'} siden`
+      
+      // For longer periods, show actual date
+      return date.toLocaleDateString('da-DK', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: diffDays > 365 ? 'numeric' : undefined 
+      })
     }
 
     // Resource management
     const handleAddResource = () => {
-      console.log('Add resource - not implemented yet')
+      editingResource.value = null
+      showResourceModal.value = true
     }
 
     const handleEditResource = (resource) => {
-      console.log('Edit resource - not implemented yet', resource)
+      editingResource.value = resource
+      showResourceModal.value = true
+    }
+
+    const closeResourceModal = () => {
+      showResourceModal.value = false
+      editingResource.value = null
+    }
+
+    const handleResourceSaved = () => {
+      // Modal will be closed by closeResourceModal
+      // Resources will be automatically updated via real-time subscription
+    }
+
+    const handleDeleteResource = async (resourceId) => {
+      if (confirm('Er du sikker på, at du vil slette denne ressource?')) {
+        const result = await deleteResource(resourceId)
+        if (result.error) {
+          console.error('Error deleting resource:', result.error)
+        }
+      }
     }
 
     const handleHideResource = (resourceId) => {
@@ -299,11 +352,20 @@ export default {
           unsubscribeBuilds = subscribeToUserBuilds(authUser.uid, (userBuilds) => {
             builds.value = userBuilds
           })
+          
+          // Subscribe to resources when user logs in
+          unsubscribeResources = subscribeToUserResources(authUser.uid, (userResources) => {
+            customResources.value = userResources
+          })
         } else {
-          // Clear builds when user logs out
+          // Clear data when user logs out
           builds.value = []
+          customResources.value = []
           if (unsubscribeBuilds) {
             unsubscribeBuilds()
+          }
+          if (unsubscribeResources) {
+            unsubscribeResources()
           }
         }
       })
@@ -312,6 +374,7 @@ export default {
     onUnmounted(() => {
       if (unsubscribeAuth) unsubscribeAuth()
       if (unsubscribeBuilds) unsubscribeBuilds()
+      if (unsubscribeResources) unsubscribeResources()
     })
 
     return {
@@ -338,6 +401,9 @@ export default {
       handleBuildSaved,
       handleAddResource,
       handleEditResource,
+      closeResourceModal,
+      handleResourceSaved,
+      handleDeleteResource,
       handleHideResource,
       handleRestoreResources,
       getStatusText,
@@ -346,6 +412,8 @@ export default {
       formatLastOpened,
       
       // Resource state
+      showResourceModal,
+      editingResource,
       customResources,
       hiddenResourceIds
     }

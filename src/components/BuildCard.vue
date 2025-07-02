@@ -97,8 +97,25 @@ export default {
     
     formatLastOpened(timestamp) {
       if (!timestamp) return 'Aldrig'
-      // This is a simplified format - in real app you'd use a proper date library
-      return 'Nyligt'
+      
+      const now = new Date()
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
+      const diffMs = now - date
+      const diffMinutes = Math.floor(diffMs / (1000 * 60))
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+      
+      if (diffMinutes < 1) return 'Lige nu'
+      if (diffMinutes < 60) return `${diffMinutes} minut${diffMinutes === 1 ? '' : 'ter'} siden`
+      if (diffHours < 24) return `${diffHours} time${diffHours === 1 ? '' : 'r'} siden`
+      if (diffDays < 30) return `${diffDays} dag${diffDays === 1 ? '' : 'e'} siden`
+      
+      // For longer periods, show actual date
+      return date.toLocaleDateString('da-DK', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: diffDays > 365 ? 'numeric' : undefined 
+      })
     }
   }
 }

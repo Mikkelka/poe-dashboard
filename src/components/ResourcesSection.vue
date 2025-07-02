@@ -53,7 +53,15 @@
                 </svg>
               </a>
               <button 
-                @click="hideResource(resource.id)" 
+                v-if="!resource.isDefault"
+                @click="$emit('edit-resource', resource)" 
+                class="action-link edit-btn"
+                title="Rediger ressource"
+              >
+                Rediger
+              </button>
+              <button 
+                @click="resource.isDefault ? hideResource(resource.id) : deleteResource(resource.id)" 
                 class="action-link delete-btn"
                 :title="resource.isDefault ? 'Skjul ressource' : 'Slet ressource'"
               >
@@ -82,7 +90,7 @@ export default {
       default: () => []
     }
   },
-  emits: ['add-resource', 'edit-resource', 'hide-resource', 'restore-resources'],
+  emits: ['add-resource', 'edit-resource', 'hide-resource', 'delete-resource', 'restore-resources'],
   computed: {
     allResources() {
       // Combine default resources with custom user resources
@@ -130,6 +138,10 @@ export default {
   methods: {
     hideResource(resourceId) {
       this.$emit('hide-resource', resourceId)
+    },
+    
+    deleteResource(resourceId) {
+      this.$emit('delete-resource', resourceId)
     },
     
     restoreAllResources() {
@@ -291,6 +303,15 @@ export default {
 
 .action-link:hover {
   background: rgba(229, 229, 229, 0.1);
+}
+
+.edit-btn {
+  color: #4caf50;
+}
+
+.edit-btn:hover {
+  background: rgba(76, 175, 80, 0.1);
+  color: #66bb6a;
 }
 
 .delete-btn {
