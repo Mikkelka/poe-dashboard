@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path of Exile Tracker - Clean</title>
+    <link rel="stylesheet" href="stylesv3.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="brand">
+                    <h1>PoE Tracker</h1>
+                    <p>Simpel og overskuelig build tracking</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary">+ Ny Build</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab active" data-tab="builds">Builds</button>
+            <button class="tab" data-tab="resources">Ressourcer</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Builds Section -->
+            <section id="builds" class="tab-content active">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Mine Builds</h2>
+                        <span class="count">6 builds</span>
+                    </div>
+                    <div class="filters">
+                        <select class="filter-dropdown">
+                            <option value="all">Alle builds</option>
+                            <option value="poe1">Path of Exile 1</option>
+                            <option value="poe2">Path of Exile 2</option>
+                            <option value="active">Kun aktive</option>
+                        </select>
+                        <div class="search-box">
+                            <input type="text" placeholder="Søg builds..." />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="builds-grid">
+                    <!-- Build Card 1 -->
+                    <div class="build-card">
+                        <div class="build-header">
+                            <div class="build-info">
+                                <h3>Lightning Strike Champion</h3>
+                                <div class="build-meta">
+                                    <span class="game-badge poe2">PoE 2</span>
+                                    <span class="status-dot active"></span>
+                                    <span class="status-text">Aktiv</span>
+                                </div>
+                            </div>
+                            <div class="build-status">
+                                <div class="guide-status up-to-date">
+                                    <span class="guide-indicator">✓</span>
+                                    <span class="guide-text">Guide opdateret</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="build-details">
+                            <div class="detail-item">
+                                <span class="label">League</span>
+                                <span class="value">Early Access</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Character</span>
+                                <span class="value">StormWarrior</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Sidst åbnet</span>
+                                <span class="value">2 timer siden</span>
+                            </div>
+                        </div>
+
+                        <div class="build-actions">
+                            <a href="#" class="action-link">
+                                <span>PoB Link</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="action-link">
+                                <span>Guide</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                            <button class="action-link edit-btn" onclick="openEditBuildModal(2)">
+                                <span>Rediger</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Build Card 2 -->
+                    <div class="build-card">
+                        <div class="build-header">
+                            <div class="build-info">
+                                <h3>Righteous Fire Juggernaut</h3>
+                                <div class="build-meta">
+                                    <span class="game-badge poe1">PoE 1</span>
+                                    <span class="status-dot paused"></span>
+                                    <span class="status-text">Pause</span>
+                                </div>
+                            </div>
+                            <div class="build-status">
+                                <div class="guide-status outdated">
+                                    <span class="guide-indicator">⚠</span>
+                                    <span class="guide-text">Guide forældet</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="build-details">
+                            <div class="detail-item">
+                                <span class="label">League</span>
+                                <span class="value">Settlers</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Character</span>
+                                <span class="value">BurningTank</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Sidst åbnet</span>
+                                <span class="value">1 uge siden</span>
+                            </div>
+                        </div>
+
+                        <div class="build-actions">
+                            <a href="#" class="action-link">
+                                <span>PoB Link</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="action-link">
+                                <span>Guide</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                            <button class="action-link edit-btn" onclick="openEditBuildModal(3)">
+                                <span>Rediger</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Build Card 3 -->
+                    <div class="build-card">
+                        <div class="build-header">
+                            <div class="build-info">
+                                <h3>Witch Hunter Monk</h3>
+                                <div class="build-meta">
+                                    <span class="game-badge poe2">PoE 2</span>
+                                    <span class="status-dot completed"></span>
+                                    <span class="status-text">Færdig</span>
+                                </div>
+                            </div>
+                            <div class="build-status">
+                                <div class="guide-status unknown">
+                                    <span class="guide-indicator">?</span>
+                                    <span class="guide-text">Guide ukendt</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="build-details">
+                            <div class="detail-item">
+                                <span class="label">League</span>
+                                <span class="value">Early Access</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Character</span>
+                                <span class="value">ShadowFist</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Sidst åbnet</span>
+                                <span class="value">3 dage siden</span>
+                            </div>
+                        </div>
+
+                        <div class="build-actions">
+                            <a href="#" class="action-link">
+                                <span>PoB Link</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="action-link">
+                                <span>Guide</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                            <button class="action-link edit-btn" onclick="openEditBuildModal(1)">
+                                <span>Rediger</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resources Section -->
+            <section id="resources" class="tab-content">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Ressourcer</h2>
+                        <span class="count">12 links</span>
+                    </div>
+                    <div class="filters">
+                        <button class="btn-outline">+ Tilføj Link</button>
+                    </div>
+                </div>
+
+                <div class="resources-container">
+                    <!-- Essential Tools -->
+                    <div class="resource-group">
+                        <h3>Essentielle Værktøjer</h3>
+                        <div class="resource-grid">
+                            <a href="https://pathofbuilding.community" class="resource-item" target="_blank">
+                                <div class="resource-icon">🔧</div>
+                                <div class="resource-content">
+                                    <h4>Path of Building</h4>
+                                    <p>Build planning og optimering</p>
+                                </div>
+                            </a>
+                            <a href="https://poedb.tw" class="resource-item" target="_blank">
+                                <div class="resource-icon">📊</div>
+                                <div class="resource-content">
+                                    <h4>PoEDB</h4>
+                                    <p>Komplet database og reference</p>
+                                </div>
+                            </a>
+                            <a href="https://pathofexile.com/trade" class="resource-item" target="_blank">
+                                <div class="resource-icon">💰</div>
+                                <div class="resource-content">
+                                    <h4>Trade Site</h4>
+                                    <p>Officiel handel og priser</p>
+                                </div>
+                            </a>
+                            <a href="https://poe.ninja" class="resource-item" target="_blank">
+                                <div class="resource-icon">📈</div>
+                                <div class="resource-content">
+                                    <h4>poe.ninja</h4>
+                                    <p>Økonomisk analyse og trends</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- PoE 2 Resources -->
+                    <div class="resource-group">
+                        <h3>Path of Exile 2</h3>
+                        <div class="resource-grid">
+                            <a href="https://poe2db.tw" class="resource-item" target="_blank">
+                                <div class="resource-icon">🆕</div>
+                                <div class="resource-content">
+                                    <h4>PoE2DB</h4>
+                                    <p>Database for Path of Exile 2</p>
+                                </div>
+                            </a>
+                            <a href="https://maxroll.gg/poe2" class="resource-item" target="_blank">
+                                <div class="resource-icon">📚</div>
+                                <div class="resource-content">
+                                    <h4>Maxroll PoE2</h4>
+                                    <p>Detaljerede guides og builds</p>
+                                </div>
+                            </a>
+                            <a href="https://mobalytics.gg/poe-2" class="resource-item" target="_blank">
+                                <div class="resource-icon">📋</div>
+                                <div class="resource-content">
+                                    <h4>Mobalytics</h4>
+                                    <p>Build guides og analyser</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Community -->
+                    <div class="resource-group">
+                        <h3>Community</h3>
+                        <div class="resource-grid">
+                            <a href="https://reddit.com/r/pathofexile" class="resource-item" target="_blank">
+                                <div class="resource-icon">💬</div>
+                                <div class="resource-content">
+                                    <h4>r/PathOfExile</h4>
+                                    <p>Reddit community og diskussioner</p>
+                                </div>
+                            </a>
+                            <a href="https://discord.gg/pathofexile" class="resource-item" target="_blank">
+                                <div class="resource-icon">🗨️</div>
+                                <div class="resource-content">
+                                    <h4>Official Discord</h4>
+                                    <p>Live chat og support</p>
+                                </div>
+                            </a>
+                            <a href="https://pathofexile.fandom.com" class="resource-item" target="_blank">
+                                <div class="resource-icon">📖</div>
+                                <div class="resource-content">
+                                    <h4>PoE Wiki</h4>
+                                    <p>Omfattende reference guide</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Add Build Modal -->
+    <div class="modal-overlay" id="addBuildModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Tilføj Nyt Build</h3>
+                <button class="modal-close" onclick="closeAddBuildModal()">&times;</button>
+            </div>
+            <form class="modal-content" id="addBuildForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="buildName">Build Navn *</label>
+                        <input type="text" id="buildName" name="buildName" placeholder="Lightning Strike Champion" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameVersion">Spil *</label>
+                        <select id="gameVersion" name="gameVersion" required>
+                            <option value="">Vælg spil</option>
+                            <option value="poe1">Path of Exile 1</option>
+                            <option value="poe2">Path of Exile 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="characterName">Character Navn</label>
+                        <input type="text" id="characterName" name="characterName" placeholder="StormWarrior">
+                    </div>
+                    <div class="form-group">
+                        <label for="league">League</label>
+                        <input type="text" id="league" name="league" placeholder="Early Access">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="buildStatus">Status *</label>
+                        <select id="buildStatus" name="buildStatus" required>
+                            <option value="active">Aktiv</option>
+                            <option value="paused">Pause</option>
+                            <option value="completed">Færdig</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guideStatus">Guide Status</label>
+                        <select id="guideStatus" name="guideStatus">
+                            <option value="unknown">Ukendt</option>
+                            <option value="up-to-date">Opdateret</option>
+                            <option value="outdated">Forældet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pobLink">Path of Building Link</label>
+                    <input type="url" id="pobLink" name="pobLink" placeholder="https://pobb.in/...">
+                </div>
+
+                <div class="form-group">
+                    <label for="guideLink">Guide Link</label>
+                    <input type="url" id="guideLink" name="guideLink" placeholder="https://maxroll.gg/...">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Noter</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Ekstra noter om buildet..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-outline" onclick="closeAddBuildModal()">Annuller</button>
+                    <button type="submit" class="btn-primary">Gem Build</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Build Modal -->
+    <div class="modal-overlay" id="editBuildModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Rediger Build</h3>
+                <button class="modal-close" onclick="closeEditBuildModal()">&times;</button>
+            </div>
+            <form class="modal-content" id="editBuildForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editBuildName">Build Navn *</label>
+                        <input type="text" id="editBuildName" name="buildName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGameVersion">Spil *</label>
+                        <select id="editGameVersion" name="gameVersion" required>
+                            <option value="">Vælg spil</option>
+                            <option value="poe1">Path of Exile 1</option>
+                            <option value="poe2">Path of Exile 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCharacterName">Character Navn</label>
+                        <input type="text" id="editCharacterName" name="characterName">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLeague">League</label>
+                        <input type="text" id="editLeague" name="league">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editBuildStatus">Status *</label>
+                        <select id="editBuildStatus" name="buildStatus" required>
+                            <option value="active">Aktiv</option>
+                            <option value="paused">Pause</option>
+                            <option value="completed">Færdig</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGuideStatus">Guide Status</label>
+                        <select id="editGuideStatus" name="guideStatus">
+                            <option value="unknown">Ukendt</option>
+                            <option value="up-to-date">Opdateret</option>
+                            <option value="outdated">Forældet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editPobLink">Path of Building Link</label>
+                    <input type="url" id="editPobLink" name="pobLink">
+                </div>
+
+                <div class="form-group">
+                    <label for="editGuideLink">Guide Link</label>
+                    <input type="url" id="editGuideLink" name="guideLink">
+                </div>
+
+                <div class="form-group">
+                    <label for="editNotes">Noter</label>
+                    <textarea id="editNotes" name="notes" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-outline" onclick="closeEditBuildModal()">Annuller</button>
+                    <button type="submit" class="btn-primary">Gem Ændringer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            // Add Build button functionality
+            const addBuildBtn = document.querySelector('.btn-primary');
+            if (addBuildBtn && addBuildBtn.textContent.includes('Ny Build')) {
+                addBuildBtn.addEventListener('click', openAddBuildModal);
+            }
+
+            // Form submission
+            document.getElementById('addBuildForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would normally save the data
+                alert('Build gemt! (I den rigtige app ville dette gemme til database)');
+                closeAddBuildModal();
+            });
+
+            // Edit form submission
+            document.getElementById('editBuildForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Here you would normally update the data
+                alert('Build opdateret! (I den rigtige app ville dette opdatere databasen)');
+                closeEditBuildModal();
+            });
+        });
+
+        // Modal functions
+        function openAddBuildModal() {
+            document.getElementById('addBuildModal').classList.add('show');
+        }
+
+        function closeAddBuildModal() {
+            document.getElementById('addBuildModal').classList.remove('show');
+            document.getElementById('addBuildForm').reset();
+        }
+
+        // Edit Build Modal functions
+        function openEditBuildModal(buildId) {
+            // In a real app, you would fetch the build data by ID
+            // For demo purposes, we'll pre-fill with sample data based on buildId
+            const sampleData = {
+                1: {
+                    name: "Lightning Strike Champion",
+                    game: "poe2",
+                    character: "StormWarrior",
+                    league: "Early Access",
+                    status: "active",
+                    guideStatus: "up-to-date",
+                    pobLink: "",
+                    guideLink: "",
+                    notes: ""
+                },
+                2: {
+                    name: "Righteous Fire Juggernaut",
+                    game: "poe1",
+                    character: "BurningTank",
+                    league: "Settlers",
+                    status: "paused",
+                    guideStatus: "outdated",
+                    pobLink: "",
+                    guideLink: "",
+                    notes: ""
+                },
+                3: {
+                    name: "Witch Hunter Monk",
+                    game: "poe2",
+                    character: "ShadowFist",
+                    league: "Early Access",
+                    status: "completed",
+                    guideStatus: "unknown",
+                    pobLink: "",
+                    guideLink: "",
+                    notes: ""
+                }
+            };
+
+            const data = sampleData[buildId];
+            if (data) {
+                document.getElementById('editBuildName').value = data.name;
+                document.getElementById('editGameVersion').value = data.game;
+                document.getElementById('editCharacterName').value = data.character;
+                document.getElementById('editLeague').value = data.league;
+                document.getElementById('editBuildStatus').value = data.status;
+                document.getElementById('editGuideStatus').value = data.guideStatus;
+                document.getElementById('editPobLink').value = data.pobLink;
+                document.getElementById('editGuideLink').value = data.guideLink;
+                document.getElementById('editNotes').value = data.notes;
+            }
+            
+            document.getElementById('editBuildModal').classList.add('show');
+        }
+
+        function closeEditBuildModal() {
+            document.getElementById('editBuildModal').classList.remove('show');
+            document.getElementById('editBuildForm').reset();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('addBuildModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddBuildModal();
+            }
+        });
+
+        document.getElementById('editBuildModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditBuildModal();
+            }
+        });
+    </script>
+</body>
+</html>
