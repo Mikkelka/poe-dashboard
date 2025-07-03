@@ -4,7 +4,9 @@ import {
   updateDoc, 
   deleteDoc, 
   doc, 
+  getDoc,
   getDocs, 
+  setDoc,
   query, 
   where, 
   orderBy,
@@ -15,6 +17,7 @@ import { db } from './config'
 
 const BUILDS_COLLECTION = 'builds'
 const RESOURCES_COLLECTION = 'resources'
+const USER_PREFERENCES_COLLECTION = 'userPreferences'
 
 /**
  * Build Data Model Structure:
@@ -221,5 +224,64 @@ export const subscribeToUserResources = (userId, callback) => {
   }, (error) => {
     console.error("Error listening to resources:", error)
     callback([])
+  })
+}
+
+/**
+ * User Preferences Data Model Structure:
+ * {
+ *   id: string (userId - same as document ID)
+ *   userId: string (Firebase Auth user ID)
+ *   hiddenResourceIds: string[] (array of hidden resource IDs)
+ *   updatedAt: Timestamp (auto-updated on changes)
+ * }
+ */
+
+// Get user preferences
+export const getUserPreferences = async (userId) => {
+  try {
+    const docRef = doc(db, USER_PREFERENCES_COLLECTION, userId)
+    const docSnap = await getDoc(docRef)
+    
+    if (docSnap.exists()) {
+      return { preferences: docSnap.data(), error: null }
+    } else {
+      // Return default preferences if none exist
+      return { preferences: { hiddenResourceIds: [] }, error: null }
+    }
+  } catch (error) {
+    return { preferences: { hiddenResourceIds: [] }, error: error.message }
+  }
+}
+
+// Update user preferences
+export const updateUserPreferences = async (userId, preferences) => {
+  try {
+    const docRef = doc(db, USER_PREFERENCES_COLLECTION, userId)
+    await setDoc(docRef, {
+      ...preferences,
+      userId,
+      updatedAt: serverTimestamp()
+    }, { merge: true })
+    return { error: null }
+  } catch (error) {
+    return { error: error.message }
+  }
+}
+
+// Listen to real-time updates for user preferences
+export const subscribeToUserPreferences = (userId, callback) => {
+  const docRef = doc(db, USER_PREFERENCES_COLLECTION, userId)
+  
+  return onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data())
+    } else {
+      // Return default preferences if none exist
+      callback({ hiddenResourceIds: [] })
+    }
+  }, (error) => {
+    console.error("Error listening to user preferences:", error)
+    callback({ hiddenResourceIds: [] })
   })
 }

@@ -19,5 +19,8 @@ export {
   updateResource,
   deleteResource,
   getUserResources,
-  subscribeToUserResources
+  subscribeToUserResources,
+  getUserPreferences,
+  updateUserPreferences,
+  subscribeToUserPreferences
 } from './firestore'

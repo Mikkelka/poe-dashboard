@@ -92,46 +92,64 @@ export default {
   },
   emits: ['add-resource', 'edit-resource', 'hide-resource', 'delete-resource', 'restore-resources'],
   computed: {
-    allResources() {
+    // Optimized: Compute all resources filtering once
+    resourcesData() {
       // Combine default resources with custom user resources
       const customResources = this.resources.filter(r => !r.isDefault)
-      return [...defaultResources, ...customResources]
-    },
-    
-    visibleResources() {
-      return this.allResources.filter(resource => 
-        !this.hiddenResourceIds.includes(resource.id)
-      )
-    },
-    
-    hiddenResources() {
-      return this.allResources.filter(resource => 
-        this.hiddenResourceIds.includes(resource.id)
-      )
-    },
-    
-    visibleResourceCount() {
-      return this.visibleResources.length
-    },
-    
-    categorizedResources() {
-      const categories = {}
+      const allResources = [...defaultResources, ...customResources]
+      
+      // Split into visible and hidden in one pass
+      const visible = []
+      const hidden = []
+      
+      allResources.forEach(resource => {
+        if (this.hiddenResourceIds.includes(resource.id)) {
+          hidden.push(resource)
+        } else {
+          visible.push(resource)
+        }
+      })
       
       // Group visible resources by category
-      this.visibleResources.forEach(resource => {
+      const categories = {}
+      visible.forEach(resource => {
         if (!categories[resource.category]) {
           categories[resource.category] = []
         }
         categories[resource.category].push(resource)
       })
       
-      // Return in specified order
-      return categoryOrder
+      // Return categorized data in specified order
+      const categorizedResources = categoryOrder
         .filter(categoryName => categories[categoryName])
         .map(categoryName => ({
           name: categoryName,
           resources: categories[categoryName]
         }))
+      
+      return {
+        visible,
+        hidden,
+        categorizedResources,
+        visibleCount: visible.length
+      }
+    },
+    
+    // Accessor computed properties for template compatibility
+    visibleResources() {
+      return this.resourcesData.visible
+    },
+    
+    hiddenResources() {
+      return this.resourcesData.hidden
+    },
+    
+    visibleResourceCount() {
+      return this.resourcesData.visibleCount
+    },
+    
+    categorizedResources() {
+      return this.resourcesData.categorizedResources
     }
   },
   

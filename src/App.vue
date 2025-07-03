@@ -61,7 +61,7 @@
               </select>
               <div class="search-box">
                 <input 
-                  v-model="searchQuery" 
+                  v-model="inputSearchQuery" 
                   type="text" 
                   placeholder="Søg builds..." 
                 />
@@ -124,8 +124,9 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds, subscribeToUserResources, deleteResource, updateLastOpened } from './firebase'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
+import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds, subscribeToUserResources, deleteResource, updateLastOpened, subscribeToUserPreferences, updateUserPreferences } from './firebase'
+import { getStatusText, getGuideIndicator, getGuideText, formatLastOpened } from './utils/helpers'
 import BuildModal from './components/BuildModal.vue'
 import ResourceModal from './components/ResourceModal.vue'
 import Header from './components/Header.vue'
@@ -153,7 +154,8 @@ export default {
     const activeTab = ref('builds')
     const builds = ref([])
     const filter = ref('all')
-    const searchQuery = ref('')
+    const inputSearchQuery = ref('')
+    const debouncedSearchQuery = ref('')
     const showModal = ref(false)
     const editingBuild = ref(null)
     const showResourceModal = ref(false)
@@ -164,6 +166,18 @@ export default {
     let unsubscribeAuth = null
     let unsubscribeBuilds = null
     let unsubscribeResources = null
+    let unsubscribePreferences = null
+    let searchDebounceTimer = null
+
+    // Debounce search input
+    watch(inputSearchQuery, (newValue) => {
+      if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer)
+      }
+      searchDebounceTimer = setTimeout(() => {
+        debouncedSearchQuery.value = newValue
+      }, 300)
+    })
 
     // Authentication methods
     const handleGoogleSignIn = async () => {
@@ -230,8 +244,8 @@ export default {
       }
 
       // Apply search
-      if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
+      if (debouncedSearchQuery.value) {
+        const query = debouncedSearchQuery.value.toLowerCase()
         filtered = filtered.filter(build => 
           build.buildName.toLowerCase().includes(query) ||
           (build.characterName && build.characterName.toLowerCase().includes(query))
@@ -241,56 +255,6 @@ export default {
       return filtered
     })
 
-    // Helper methods
-    const getStatusText = (status) => {
-      const statusMap = {
-        'active': 'Aktiv',
-        'paused': 'Pause',
-        'completed': 'Færdig'
-      }
-      return statusMap[status] || status
-    }
-
-    const getGuideIndicator = (status) => {
-      const indicatorMap = {
-        'up-to-date': '✓',
-        'outdated': '⚠',
-        'unknown': '?'
-      }
-      return indicatorMap[status] || '?'
-    }
-
-    const getGuideText = (status) => {
-      const textMap = {
-        'up-to-date': 'Guide opdateret',
-        'outdated': 'Guide forældet',
-        'unknown': 'Guide ukendt'
-      }
-      return textMap[status] || 'Guide ukendt'
-    }
-
-    const formatLastOpened = (timestamp) => {
-      if (!timestamp) return 'Aldrig'
-      
-      const now = new Date()
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
-      const diffMs = now - date
-      const diffMinutes = Math.floor(diffMs / (1000 * 60))
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-      
-      if (diffMinutes < 1) return 'Lige nu'
-      if (diffMinutes < 60) return `${diffMinutes} minut${diffMinutes === 1 ? '' : 'ter'} siden`
-      if (diffHours < 24) return `${diffHours} time${diffHours === 1 ? '' : 'r'} siden`
-      if (diffDays < 30) return `${diffDays} dag${diffDays === 1 ? '' : 'e'} siden`
-      
-      // For longer periods, show actual date
-      return date.toLocaleDateString('da-DK', { 
-        day: 'numeric', 
-        month: 'short', 
-        year: diffDays > 365 ? 'numeric' : undefined 
-      })
-    }
 
     // Resource management
     const handleAddResource = () => {
@@ -322,39 +286,38 @@ export default {
       }
     }
 
-    const handleHideResource = (resourceId) => {
-      if (!hiddenResourceIds.value.includes(resourceId)) {
-        hiddenResourceIds.value.push(resourceId)
-        // Save to localStorage for persistence
-        localStorage.setItem('hiddenResourceIds', JSON.stringify(hiddenResourceIds.value))
+    const handleHideResource = async (resourceId) => {
+      if (!hiddenResourceIds.value.includes(resourceId) && user.value) {
+        const newHiddenIds = [...hiddenResourceIds.value, resourceId]
+        await updateUserPreferences(user.value.uid, { hiddenResourceIds: newHiddenIds })
       }
     }
 
-    const handleRestoreResources = () => {
-      hiddenResourceIds.value = []
-      localStorage.removeItem('hiddenResourceIds')
-    }
-
-    // Load hidden resources from localStorage on mount
-    const loadHiddenResources = () => {
-      const saved = localStorage.getItem('hiddenResourceIds')
-      if (saved) {
-        try {
-          hiddenResourceIds.value = JSON.parse(saved)
-        } catch (e) {
-          console.error('Error loading hidden resources:', e)
-        }
+    const handleRestoreResources = async () => {
+      if (user.value) {
+        await updateUserPreferences(user.value.uid, { hiddenResourceIds: [] })
       }
     }
 
     // Lifecycle hooks
     onMounted(() => {
-      // Load hidden resources from localStorage
-      loadHiddenResources()
-      
       // Listen for auth state changes
       unsubscribeAuth = onAuthChange((authUser) => {
         user.value = authUser
+        
+        // Clean up existing subscriptions first
+        if (unsubscribeBuilds) {
+          unsubscribeBuilds()
+          unsubscribeBuilds = null
+        }
+        if (unsubscribeResources) {
+          unsubscribeResources()
+          unsubscribeResources = null
+        }
+        if (unsubscribePreferences) {
+          unsubscribePreferences()
+          unsubscribePreferences = null
+        }
         
         if (authUser) {
           // Subscribe to builds when user logs in
@@ -366,16 +329,16 @@ export default {
           unsubscribeResources = subscribeToUserResources(authUser.uid, (userResources) => {
             customResources.value = userResources
           })
+          
+          // Subscribe to user preferences when user logs in
+          unsubscribePreferences = subscribeToUserPreferences(authUser.uid, (preferences) => {
+            hiddenResourceIds.value = preferences.hiddenResourceIds || []
+          })
         } else {
           // Clear data when user logs out
           builds.value = []
           customResources.value = []
-          if (unsubscribeBuilds) {
-            unsubscribeBuilds()
-          }
-          if (unsubscribeResources) {
-            unsubscribeResources()
-          }
+          hiddenResourceIds.value = []
         }
       })
     })
@@ -384,6 +347,7 @@ export default {
       if (unsubscribeAuth) unsubscribeAuth()
       if (unsubscribeBuilds) unsubscribeBuilds()
       if (unsubscribeResources) unsubscribeResources()
+      if (unsubscribePreferences) unsubscribePreferences()
     })
 
     return {
@@ -398,7 +362,7 @@ export default {
       activeTab,
       builds,
       filter,
-      searchQuery,
+      inputSearchQuery,
       showModal,
       editingBuild,
       filteredBuilds,
