@@ -84,6 +84,7 @@
               :key="build.id" 
               :build="build"
               @edit-build="openEditBuildModal"
+              @link-clicked="handleLinkClicked"
             />
           </div>
         </section>
@@ -124,7 +125,7 @@
 
 <script>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds, subscribeToUserResources, deleteResource } from './firebase'
+import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds, subscribeToUserResources, deleteResource, updateLastOpened } from './firebase'
 import BuildModal from './components/BuildModal.vue'
 import ResourceModal from './components/ResourceModal.vue'
 import Header from './components/Header.vue'
@@ -192,9 +193,17 @@ export default {
       showModal.value = true
     }
 
-    const openEditBuildModal = (build) => {
+    const openEditBuildModal = async (build) => {
       editingBuild.value = build
       showModal.value = true
+      
+      // Update last opened timestamp
+      await updateLastOpened(build.id)
+    }
+
+    const handleLinkClicked = async (buildId) => {
+      // Update last opened timestamp when user clicks on build links
+      await updateLastOpened(buildId)
     }
 
     const closeModal = () => {
@@ -397,6 +406,7 @@ export default {
       // Methods
       openAddBuildModal,
       openEditBuildModal,
+      handleLinkClicked,
       closeModal,
       handleBuildSaved,
       handleAddResource,

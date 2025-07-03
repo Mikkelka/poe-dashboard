@@ -3,19 +3,20 @@
     <div class="build-header">
       <div class="build-info">
         <h3>{{ build.buildName }}</h3>
-        <div class="build-meta">
-          <span class="game-badge" :class="build.gameVersion">
-            {{ build.gameVersion === 'poe1' ? 'PoE 1' : 'PoE 2' }}
-          </span>
-          <span class="status-dot" :class="build.buildStatus"></span>
-          <span class="status-text">{{ getStatusText(build.buildStatus) }}</span>
-        </div>
       </div>
-      <div class="build-status">
-        <div class="guide-status" :class="build.guideStatus">
-          <span class="guide-indicator">{{ getGuideIndicator(build.guideStatus) }}</span>
-          <span class="guide-text">{{ getGuideText(build.guideStatus) }}</span>
-        </div>
+    </div>
+    
+    <div class="build-meta">
+      <div class="build-meta-left">
+        <span class="game-badge" :class="build.gameVersion">
+          {{ build.gameVersion === 'poe1' ? 'PoE 1' : 'PoE 2' }}
+        </span>
+        <span class="status-dot" :class="build.buildStatus"></span>
+        <span class="status-text">{{ getStatusText(build.buildStatus) }}</span>
+      </div>
+      <div class="guide-status" :class="build.guideStatus">
+        <span class="guide-indicator">{{ getGuideIndicator(build.guideStatus) }}</span>
+        <span class="guide-text">{{ getGuideText(build.guideStatus) }}</span>
       </div>
     </div>
     
@@ -35,13 +36,13 @@
     </div>
 
     <div class="build-actions">
-      <a v-if="build.pobLink" :href="build.pobLink" target="_blank" class="action-link">
+      <a v-if="build.pobLink" :href="build.pobLink" target="_blank" class="action-link" @click="$emit('link-clicked', build.id)">
         <span>PoB Link</span>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
-      <a v-if="build.guideLink" :href="build.guideLink" target="_blank" class="action-link">
+      <a v-if="build.guideLink" :href="build.guideLink" target="_blank" class="action-link" @click="$emit('link-clicked', build.id)">
         <span>Guide</span>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -66,7 +67,7 @@ export default {
       required: true
     }
   },
-  emits: ['edit-build'],
+  emits: ['edit-build', 'link-clicked'],
   methods: {
     getStatusText(status) {
       const statusMap = {
@@ -137,20 +138,24 @@ export default {
 }
 
 .build-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .build-info h3 {
   font-size: 1.2rem;
   font-weight: 600;
   color: #e5e5e5;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .build-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.build-meta-left {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -196,13 +201,6 @@ export default {
 .status-text {
   font-size: 0.8rem;
   color: #999999;
-}
-
-.build-status {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
 }
 
 .guide-status {
