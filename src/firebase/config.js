@@ -5,12 +5,12 @@ import { getFirestore } from 'firebase/firestore'
 
 // Firebase project configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDPSLOwpSdhU1y2vPZuFnRr-27jVUqLoSg",
-  authDomain: "poe-dashboard-5d056.firebaseapp.com",
-  projectId: "poe-dashboard-5d056",
-  storageBucket: "poe-dashboard-5d056.firebasestorage.app",
-  messagingSenderId: "348490760341",
-  appId: "1:348490760341:web:71c094f83d5cc230199b9c"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
 // Initialize Firebase

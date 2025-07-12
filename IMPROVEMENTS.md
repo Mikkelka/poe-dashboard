@@ -4,7 +4,7 @@ Dette dokument indeholder forslag til forbedringer af PoE Dashboard kodebasen ba
 
 ## 🏗️ Arkitektur og Struktur
 
-### 1. Opdel store komponenter
+### 1. Opdel store komponenter (LØST)
 **Problem:** App.vue er 400+ linjer og indeholder for meget forretningslogik.
 
 **Løsning:**
@@ -22,7 +22,7 @@ export function useBuilds() {
 }
 ```
 
-### 2. Centraliser styling og tema
+### 2. Centraliser styling og tema (LØST)
 **Problem:** Duplikeret CSS på tværs af komponenter.
 
 **Løsning:**
@@ -46,7 +46,7 @@ export function useBuilds() {
 
 ## 🔒 Sikkerhed og Environment
 
-### 3. Sikre Firebase konfiguration
+### 3. Sikre Firebase konfiguration (LØST)
 **KRITISK:** Firebase API nøgler er eksponeret i klient-koden.
 
 **Løsning:**
