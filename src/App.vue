@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="w-full min-h-screen bg-black text-gray-200">
+  <div id="app" class="w-full min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 text-gray-200">
     <!-- Authentication Section -->
     <div v-if="!user" class="flex justify-center items-center min-h-screen p-5">
       <div class="auth-form">
@@ -31,7 +31,7 @@
     <!-- Main App Content -->
     <div v-else class="container-main">
       <!-- Header -->
-      <Header 
+      <AppHeader 
         :user="user" 
         @logout="handleLogout" 
         @new-build="openAddBuildModal" 
@@ -134,7 +134,7 @@ import { useSearch } from './composables/useSearch'
 import { useTab } from './composables/useTab'
 import BuildModal from './components/BuildModal.vue'
 import ResourceModal from './components/ResourceModal.vue'
-import Header from './components/Header.vue'
+import AppHeader from './components/AppHeader.vue'
 import Navigation from './components/Navigation.vue'
 import BuildCard from './components/BuildCard.vue'
 import ResourcesSection from './components/ResourcesSection.vue'
@@ -144,7 +144,7 @@ export default {
   components: {
     BuildModal,
     ResourceModal,
-    Header,
+    AppHeader,
     Navigation,
     BuildCard,
     ResourcesSection

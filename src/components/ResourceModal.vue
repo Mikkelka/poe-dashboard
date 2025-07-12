@@ -1,26 +1,27 @@
 <template>
   <div v-if="show" class="modal-overlay" @click="handleOverlayClick">
-    <div class="modal" @click.stop>
+    <div class="modal glass-modal" @click.stop>
       <div class="modal-header">
         <h3>{{ editingResource ? 'Rediger Ressource' : 'Tilføj Ny Ressource' }}</h3>
         <button class="modal-close" @click="closeModal">&times;</button>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-content">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="title">Titel *</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="flex flex-col gap-1.5">
+            <label for="title" class="text-gray-200 text-sm font-medium">Titel *</label>
             <input 
               v-model="formData.title" 
               type="text" 
               id="title"
               placeholder="PoE Planner" 
               required
+              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
             />
           </div>
-          <div class="form-group">
-            <label for="category">Kategori *</label>
-            <select v-model="formData.category" id="category" required>
+          <div class="flex flex-col gap-1.5">
+            <label for="category" class="text-gray-200 text-sm font-medium">Kategori *</label>
+            <select v-model="formData.category" id="category" required class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors">
               <option value="">Vælg kategori</option>
               <option value="Path of Exile 1">Path of Exile 1</option>
               <option value="Path of Exile 2">Path of Exile 2</option>
@@ -30,47 +31,49 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="description">Beskrivelse *</label>
+        <div class="flex flex-col gap-1.5 mb-5">
+          <label for="description" class="text-gray-200 text-sm font-medium">Beskrivelse *</label>
           <input 
             v-model="formData.description" 
             type="text" 
             id="description"
             placeholder="Detaljeret build planlægning værktøj"
             required
+            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
           />
         </div>
 
-        <div class="form-group">
-          <label for="url">URL *</label>
+        <div class="flex flex-col gap-1.5 mb-5">
+          <label for="url" class="text-gray-200 text-sm font-medium">URL *</label>
           <input 
             v-model="formData.url" 
             type="url" 
             id="url"
             placeholder="https://example.com"
             required
+            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
           />
         </div>
 
-        <div class="form-group">
-          <label for="icon">Ikon (Emoji)</label>
-          <div class="icon-input-container">
+        <div class="flex flex-col gap-1.5 mb-5">
+          <label for="icon" class="text-gray-200 text-sm font-medium">Ikon (Emoji)</label>
+          <div class="flex flex-col gap-3">
             <input 
               v-model="formData.icon" 
               type="text" 
               id="icon"
               placeholder="🔧"
               maxlength="2"
-              class="icon-input"
+              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500 w-20 text-center text-lg"
             />
-            <div class="icon-suggestions">
+            <div class="grid grid-cols-10 gap-2 p-3 bg-slate-900/50 border border-slate-600/50 rounded-lg max-h-40 overflow-y-auto">
               <button 
                 v-for="emoji in commonEmojis" 
                 :key="emoji"
                 type="button"
                 @click="formData.icon = emoji"
-                class="emoji-btn"
-                :class="{ active: formData.icon === emoji }"
+                class="w-8 h-8 flex items-center justify-center bg-transparent border border-slate-600/50 rounded-md cursor-pointer text-lg transition-all hover:border-slate-400 hover:bg-slate-800/50"
+                :class="{ 'border-slate-400 bg-slate-700/50': formData.icon === emoji }"
               >
                 {{ emoji }}
               </button>
@@ -82,7 +85,7 @@
           {{ error }}
         </div>
 
-        <div class="form-actions">
+        <div class="flex gap-3 justify-end mt-8 pt-5 border-t border-slate-600/40">
           <button type="button" class="btn-outline" @click="closeModal" :disabled="loading">
             Annuller
           </button>
@@ -221,236 +224,5 @@ export default {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #333333;
-}
-
-.modal-header h3 {
-  color: #e5e5e5;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: #999999;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-  background: #333333;
-  color: #e5e5e5;
-}
-
-.modal-content {
-  padding: 24px;
-}
-
-/* Form Styles */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  color: #e5e5e5;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-  background: #0f0f0f;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 12px;
-  color: #e5e5e5;
-  font-size: 0.9rem;
-  transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #e5e5e5;
-}
-
-.form-group input::placeholder {
-  color: #666666;
-}
-
-/* Icon input styles */
-.icon-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.icon-input {
-  width: 80px;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.icon-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px;
-  background: #0f0f0f;
-  border: 1px solid #333333;
-  border-radius: 8px;
-}
-
-.emoji-btn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  min-width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.emoji-btn:hover {
-  background: #333333;
-}
-
-.emoji-btn.active {
-  background: #e5e5e5;
-}
-
-.error-message {
-  color: #ff6b6b;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
-  padding: 12px;
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  border-radius: 8px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #333333;
-}
-
-.btn-primary {
-  background: #e5e5e5;
-  color: #1a1a1a;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #cccccc;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-outline {
-  background: transparent;
-  color: #e5e5e5;
-  border: 1px solid #333333;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-outline:hover:not(:disabled) {
-  border-color: #e5e5e5;
-}
-
-.btn-outline:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .modal {
-    width: 95%;
-    margin: 20px;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .icon-suggestions {
-    justify-content: center;
-  }
-}
+/* Using Tailwind CSS classes from style.css - no custom CSS needed */
 </style>

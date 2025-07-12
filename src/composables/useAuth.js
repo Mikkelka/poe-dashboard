@@ -21,7 +21,7 @@ export function useAuth() {
       if (result.error) {
         authError.value = result.error
       }
-    } catch (error) {
+    } catch {
       authError.value = 'Der opstod en fejl under login. Prøv igen.'
     } finally {
       loading.value = false

@@ -1,26 +1,27 @@
 <template>
   <div v-if="show" class="modal-overlay" @click="handleOverlayClick">
-    <div class="modal" @click.stop>
+    <div class="modal glass-modal" @click.stop>
       <div class="modal-header">
         <h3>{{ editingBuild ? 'Rediger Build' : 'Tilføj Nyt Build' }}</h3>
         <button class="modal-close" @click="closeModal">&times;</button>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-content">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="buildName">Build Navn *</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="flex flex-col gap-1.5">
+            <label for="buildName" class="text-gray-200 text-sm font-medium">Build Navn *</label>
             <input 
               v-model="formData.buildName" 
               type="text" 
               id="buildName"
               placeholder="Lightning Strike Champion" 
               required
+              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
             />
           </div>
-          <div class="form-group">
-            <label for="gameVersion">Spil *</label>
-            <select v-model="formData.gameVersion" id="gameVersion" required>
+          <div class="flex flex-col gap-1.5">
+            <label for="gameVersion" class="text-gray-200 text-sm font-medium">Spil *</label>
+            <select v-model="formData.gameVersion" id="gameVersion" required class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors">
               <option value="">Vælg spil</option>
               <option value="poe1">Path of Exile 1</option>
               <option value="poe2">Path of Exile 2</option>
@@ -28,39 +29,41 @@
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="characterName">Character Navn</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="flex flex-col gap-1.5">
+            <label for="characterName" class="text-gray-200 text-sm font-medium">Character Navn</label>
             <input 
               v-model="formData.characterName" 
               type="text" 
               id="characterName"
               placeholder="StormWarrior"
+              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
             />
           </div>
-          <div class="form-group">
-            <label for="league">League</label>
+          <div class="flex flex-col gap-1.5">
+            <label for="league" class="text-gray-200 text-sm font-medium">League</label>
             <input 
               v-model="formData.league" 
               type="text" 
               id="league"
               placeholder="Early Access"
+              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
             />
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="buildStatus">Status *</label>
-            <select v-model="formData.buildStatus" id="buildStatus" required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="flex flex-col gap-1.5">
+            <label for="buildStatus" class="text-gray-200 text-sm font-medium">Status *</label>
+            <select v-model="formData.buildStatus" id="buildStatus" required class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors">
               <option value="active">Aktiv</option>
               <option value="paused">Pause</option>
               <option value="completed">Færdig</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="guideStatus">Guide Status</label>
-            <select v-model="formData.guideStatus" id="guideStatus">
+          <div class="flex flex-col gap-1.5">
+            <label for="guideStatus" class="text-gray-200 text-sm font-medium">Guide Status</label>
+            <select v-model="formData.guideStatus" id="guideStatus" class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors">
               <option value="unknown">Ukendt</option>
               <option value="up-to-date">Opdateret</option>
               <option value="outdated">Forældet</option>
@@ -68,33 +71,36 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="pobLink">Path of Building Link</label>
+        <div class="flex flex-col gap-1.5 mb-5">
+          <label for="pobLink" class="text-gray-200 text-sm font-medium">Path of Building Link</label>
           <input 
             v-model="formData.pobLink" 
             type="url" 
             id="pobLink"
             placeholder="https://pobb.in/..."
+            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
           />
         </div>
 
-        <div class="form-group">
-          <label for="guideLink">Guide Link</label>
+        <div class="flex flex-col gap-1.5 mb-5">
+          <label for="guideLink" class="text-gray-200 text-sm font-medium">Guide Link</label>
           <input 
             v-model="formData.guideLink" 
             type="url" 
             id="guideLink"
             placeholder="https://maxroll.gg/..."
+            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
           />
         </div>
 
-        <div class="form-group">
-          <label for="notes">Noter</label>
+        <div class="flex flex-col gap-1.5 mb-5">
+          <label for="notes" class="text-gray-200 text-sm font-medium">Noter</label>
           <textarea 
             v-model="formData.notes" 
             id="notes"
             rows="3" 
             placeholder="Ekstra noter om buildet..."
+            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500 resize-none"
           ></textarea>
         </div>
 
@@ -102,7 +108,7 @@
           {{ error }}
         </div>
 
-        <div class="form-actions">
+        <div class="flex gap-3 justify-end mt-8 pt-5 border-t border-slate-600/40">
           <button type="button" class="btn-outline" @click="closeModal" :disabled="loading">
             Annuller
           </button>
@@ -116,7 +122,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { addBuild, updateBuild } from '../firebase'
 
 export default {
@@ -245,194 +251,5 @@ export default {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #333333;
-}
-
-.modal-header h3 {
-  color: #e5e5e5;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: #999999;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-  background: #333333;
-  color: #e5e5e5;
-}
-
-.modal-content {
-  padding: 24px;
-}
-
-/* Form Styles */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-group label {
-  color: #e5e5e5;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  background: #0f0f0f;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 12px;
-  color: #e5e5e5;
-  font-size: 0.9rem;
-  transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #e5e5e5;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #666666;
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-  font-family: inherit;
-}
-
-.error-message {
-  color: #ff6b6b;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
-  padding: 12px;
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  border-radius: 8px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #333333;
-}
-
-.btn-primary {
-  background: #e5e5e5;
-  color: #1a1a1a;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #cccccc;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-outline {
-  background: transparent;
-  color: #e5e5e5;
-  border: 1px solid #333333;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-outline:hover:not(:disabled) {
-  border-color: #e5e5e5;
-}
-
-.btn-outline:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .modal {
-    width: 95%;
-    margin: 20px;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-}
+/* Using Tailwind CSS classes from style.css - no custom CSS needed */
 </style>

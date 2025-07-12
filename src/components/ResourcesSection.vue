@@ -1,11 +1,11 @@
 <template>
   <section class="tab-content">
     <div class="section-header">
-      <div class="section-title">
-        <h2>Ressourcer</h2>
-        <span class="count">{{ visibleResourceCount }} links</span>
+      <div class="flex items-center gap-3">
+        <h2 class="text-2xl font-semibold text-gray-200">Ressourcer</h2>
+        <span class="count-badge">{{ visibleResourceCount }} links</span>
       </div>
-      <div class="section-actions">
+      <div class="flex gap-3">
         <button 
           v-if="hiddenResources.length > 0" 
           @click="restoreAllResources" 
@@ -27,25 +27,25 @@
       </p>
     </div>
     
-    <div v-else class="resources-container">
+    <div v-else class="flex flex-col gap-10">
       <div 
         v-for="category in categorizedResources" 
         :key="category.name"
-        class="resource-group"
+        class="space-y-5"
       >
-        <h3>{{ category.name }}</h3>
-        <div class="resource-grid">
+        <h3 class="text-xl font-semibold text-gray-200 mb-5 pb-2 border-b border-slate-600/40">{{ category.name }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <div 
             v-for="resource in category.resources" 
             :key="resource.id" 
-            class="resource-item"
+            class="resource-card"
           >
-            <div class="resource-icon">{{ resource.icon }}</div>
-            <div class="resource-content">
-              <h4>{{ resource.title }}</h4>
-              <p>{{ resource.description }}</p>
+            <div class="text-3xl min-w-10 flex items-center justify-center">{{ resource.icon }}</div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-gray-200 text-lg font-semibold mb-1">{{ resource.title }}</h4>
+              <p class="text-gray-400 text-sm leading-relaxed">{{ resource.description }}</p>
             </div>
-            <div class="resource-actions">
+            <div class="flex flex-col gap-2 items-end">
               <a :href="resource.url" target="_blank" class="action-link">
                 Åbn
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -55,14 +55,14 @@
               <button 
                 v-if="!resource.isDefault"
                 @click="$emit('edit-resource', resource)" 
-                class="action-link edit-btn"
+                class="action-link text-green-400 hover:text-green-300 hover:bg-green-400/10"
                 title="Rediger ressource"
               >
                 Rediger
               </button>
               <button 
                 @click="resource.isDefault ? hideResource(resource.id) : deleteResource(resource.id)" 
-                class="action-link delete-btn"
+                class="action-link text-red-400 hover:text-red-300 hover:bg-red-400/10"
                 :title="resource.isDefault ? 'Skjul ressource' : 'Slet ressource'"
               >
                 {{ resource.isDefault ? 'Skjul' : 'Slet' }}
@@ -75,294 +75,86 @@
   </section>
 </template>
 
-<script>
+<script setup>
+import { computed } from 'vue'
 import { defaultResources, categoryOrder } from '../data/resources.js'
 
-export default {
-  name: 'ResourcesSection',
-  props: {
-    resources: {
-      type: Array,
-      default: () => []
-    },
-    hiddenResourceIds: {
-      type: Array,
-      default: () => []
-    }
+const props = defineProps({
+  resources: {
+    type: Array,
+    default: () => []
   },
-  emits: ['add-resource', 'edit-resource', 'hide-resource', 'delete-resource', 'restore-resources'],
-  computed: {
-    // Optimized: Compute all resources filtering once
-    resourcesData() {
-      // Combine default resources with custom user resources
-      const customResources = this.resources.filter(r => !r.isDefault)
-      const allResources = [...defaultResources, ...customResources]
-      
-      // Split into visible and hidden in one pass
-      const visible = []
-      const hidden = []
-      
-      allResources.forEach(resource => {
-        if (this.hiddenResourceIds.includes(resource.id)) {
-          hidden.push(resource)
-        } else {
-          visible.push(resource)
-        }
-      })
-      
-      // Group visible resources by category
-      const categories = {}
-      visible.forEach(resource => {
-        if (!categories[resource.category]) {
-          categories[resource.category] = []
-        }
-        categories[resource.category].push(resource)
-      })
-      
-      // Return categorized data in specified order
-      const categorizedResources = categoryOrder
-        .filter(categoryName => categories[categoryName])
-        .map(categoryName => ({
-          name: categoryName,
-          resources: categories[categoryName]
-        }))
-      
-      return {
-        visible,
-        hidden,
-        categorizedResources,
-        visibleCount: visible.length
-      }
-    },
-    
-    // Accessor computed properties for template compatibility
-    visibleResources() {
-      return this.resourcesData.visible
-    },
-    
-    hiddenResources() {
-      return this.resourcesData.hidden
-    },
-    
-    visibleResourceCount() {
-      return this.resourcesData.visibleCount
-    },
-    
-    categorizedResources() {
-      return this.resourcesData.categorizedResources
-    }
-  },
-  
-  methods: {
-    hideResource(resourceId) {
-      this.$emit('hide-resource', resourceId)
-    },
-    
-    deleteResource(resourceId) {
-      this.$emit('delete-resource', resourceId)
-    },
-    
-    restoreAllResources() {
-      this.$emit('restore-resources')
-    }
+  hiddenResourceIds: {
+    type: Array,
+    default: () => []
   }
+})
+
+const emit = defineEmits(['add-resource', 'edit-resource', 'hide-resource', 'delete-resource', 'restore-resources'])
+
+// Optimized: Compute all resources filtering once
+const resourcesData = computed(() => {
+  // Combine default resources with custom user resources
+  const customResources = props.resources.filter(r => !r.isDefault)
+  const allResources = [...defaultResources, ...customResources]
+  
+  // Split into visible and hidden in one pass
+  const visible = []
+  const hidden = []
+  
+  allResources.forEach(resource => {
+    if (props.hiddenResourceIds.includes(resource.id)) {
+      hidden.push(resource)
+    } else {
+      visible.push(resource)
+    }
+  })
+  
+  // Group visible resources by category
+  const categories = {}
+  visible.forEach(resource => {
+    if (!categories[resource.category]) {
+      categories[resource.category] = []
+    }
+    categories[resource.category].push(resource)
+  })
+  
+  // Return categorized data in specified order
+  const categorizedResources = categoryOrder
+    .filter(categoryName => categories[categoryName])
+    .map(categoryName => ({
+      name: categoryName,
+      resources: categories[categoryName]
+    }))
+  
+  return {
+    visible,
+    hidden,
+    categorizedResources,
+    visibleCount: visible.length
+  }
+})
+
+// Accessor computed properties for template compatibility
+const visibleResources = computed(() => resourcesData.value.visible)
+const hiddenResources = computed(() => resourcesData.value.hidden)
+const visibleResourceCount = computed(() => resourcesData.value.visibleCount)
+const categorizedResources = computed(() => resourcesData.value.categorizedResources)
+
+// Methods
+const hideResource = (resourceId) => {
+  emit('hide-resource', resourceId)
+}
+
+const deleteResource = (resourceId) => {
+  emit('delete-resource', resourceId)
+}
+
+const restoreAllResources = () => {
+  emit('restore-resources')
 }
 </script>
 
 <style scoped>
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.section-title h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #e5e5e5;
-}
-
-.count {
-  background: #333333;
-  color: #999999;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.section-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-primary {
-  background: #e5e5e5;
-  color: #1a1a1a;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #cccccc;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999999;
-}
-
-.empty-state h3 {
-  color: #e5e5e5;
-  margin-bottom: 8px;
-}
-
-.resources-container {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-
-.resource-group h3 {
-  color: #e5e5e5;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #333333;
-}
-
-.resource-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.resource-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.resource-item:hover {
-  border-color: #555555;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.resource-icon {
-  font-size: 2rem;
-  min-width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.resource-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.resource-content h4 {
-  color: #e5e5e5;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-}
-
-.resource-content p {
-  color: #999999;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.resource-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-end;
-}
-
-.action-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #e5e5e5;
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-
-.action-link:hover {
-  background: rgba(229, 229, 229, 0.1);
-}
-
-.edit-btn {
-  color: #4caf50;
-}
-
-.edit-btn:hover {
-  background: rgba(76, 175, 80, 0.1);
-  color: #66bb6a;
-}
-
-.delete-btn {
-  color: #ff6b6b;
-}
-
-.delete-btn:hover {
-  background: rgba(255, 107, 107, 0.1);
-  color: #ff9999;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .section-header {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-  }
-  
-  .resource-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .resource-item {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-  }
-  
-  .resource-actions {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
-}
+/* Using Tailwind CSS classes - no custom CSS needed */
 </style>

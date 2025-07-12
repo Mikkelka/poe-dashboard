@@ -78,25 +78,17 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { getStatusText, getGuideIndicator, getGuideText, formatLastOpened } from '../utils/helpers'
 
-export default {
-  name: 'BuildCard',
-  props: {
-    build: {
-      type: Object,
-      required: true
-    }
-  },
-  emits: ['edit-build', 'link-clicked'],
-  methods: {
-    getStatusText,
-    getGuideIndicator, 
-    getGuideText,
-    formatLastOpened
+defineProps({
+  build: {
+    type: Object,
+    required: true
   }
-}
+})
+
+defineEmits(['edit-build', 'link-clicked'])
 </script>
 
 <style scoped>

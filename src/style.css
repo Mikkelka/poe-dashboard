@@ -35,13 +35,13 @@ body {
 
 /* CARDS & CONTAINERS */
 .auth-form {
-  @apply bg-gray-900 border border-gray-700 rounded-xl p-10 w-full 
-         max-w-md text-center;
+  @apply bg-slate-800/70 backdrop-blur-md border border-slate-600/60 rounded-xl p-10 w-full 
+         max-w-md text-center shadow-2xl;
 }
 
 .build-card {
-  @apply bg-gray-900 border border-gray-700 rounded-xl p-6 transition-all 
-         hover:border-gray-600 hover:-translate-y-0.5 hover:shadow-xl;
+  @apply bg-slate-800/60 backdrop-blur-sm border border-slate-600/50 rounded-xl p-6 transition-all 
+         hover:border-slate-500 hover:-translate-y-0.5 hover:shadow-xl hover:bg-slate-800/80;
 }
 
 .container-main {
@@ -49,7 +49,7 @@ body {
 }
 
 .header-full {
-  @apply bg-gray-900 border-b border-gray-700 py-6 mb-8 w-screen 
+  @apply bg-slate-800/40 backdrop-blur-md border-b border-slate-600/40 py-6 mb-8 w-screen 
          relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw];
 }
 
@@ -85,7 +85,7 @@ body {
 }
 
 .count-badge {
-  @apply bg-gray-700 text-gray-400 px-3 py-1 rounded-full text-xs font-medium;
+  @apply bg-slate-700/80 text-slate-300 px-3 py-1 rounded-full text-xs font-medium;
 }
 
 /* LAYOUT */
@@ -99,4 +99,42 @@ body {
 
 .header-actions {
   @apply flex flex-col md:flex-row items-center gap-3 md:gap-4;
+}
+
+/* RESOURCE COMPONENTS */
+.resource-card {
+  @apply bg-slate-800/70 backdrop-blur-sm border border-slate-600/60 rounded-xl p-5 transition-all 
+         hover:border-slate-500 hover:-translate-y-0.5 hover:shadow-xl hover:bg-slate-800/90
+         flex items-center gap-4 relative shadow-lg;
+}
+
+.empty-state {
+  @apply bg-slate-800/60 backdrop-blur-sm border border-slate-600/50 rounded-xl p-12 text-center mb-8;
+}
+
+/* MODAL COMPONENTS */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+}
+
+.glass-modal {
+  @apply bg-slate-800/90 backdrop-blur-md border border-slate-600/60 rounded-xl 
+         w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl !important;
+}
+
+.modal-header {
+  @apply flex justify-between items-center p-6 border-b border-slate-600/40;
+}
+
+.modal-header h3 {
+  @apply text-xl font-semibold text-gray-200;
+}
+
+.modal-close {
+  @apply text-gray-400 hover:text-gray-200 text-2xl bg-transparent border-none cursor-pointer 
+         transition-colors p-1 rounded-lg hover:bg-slate-700/50;
+}
+
+.modal-content {
+  @apply p-6;
 }
