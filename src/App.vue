@@ -2,14 +2,14 @@
   <div id="app" class="w-full min-h-screen bg-black text-gray-200">
     <!-- Authentication Section -->
     <div v-if="!user" class="flex justify-center items-center min-h-screen p-5">
-      <div class="bg-gray-900 border border-gray-700 rounded-xl p-10 w-full max-w-md text-center">
+      <div class="auth-form">
         <h1 class="text-gray-200 text-3xl font-bold mb-2">PoE Tracker</h1>
         <p class="text-gray-400 mb-8">Log ind for at få adgang til dine builds</p>
         
         <div class="flex flex-col gap-4">
           <button 
             @click="handleGoogleSignIn" 
-            class="flex items-center justify-center gap-3 bg-white text-gray-900 border border-gray-300 px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all hover:bg-gray-100 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed w-full" 
+            class="btn-google" 
             :disabled="loading"
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
@@ -22,14 +22,14 @@
           </button>
         </div>
         
-        <div v-if="authError" class="text-red-400 mt-4 text-sm p-3 bg-red-900/20 border border-red-800/50 rounded-lg">
+        <div v-if="authError" class="error-message">
           {{ authError }}
         </div>
       </div>
     </div>
 
     <!-- Main App Content -->
-    <div v-else class="max-w-6xl mx-auto px-6">
+    <div v-else class="container-main">
       <!-- Header -->
       <Header 
         :user="user" 
@@ -47,13 +47,13 @@
       <main>
         <!-- Builds Section -->
         <section v-if="activeTab === 'builds'">
-          <div class="flex justify-between items-center mb-8">
+          <div class="section-header">
             <div class="flex items-center gap-3">
               <h2 class="text-2xl font-semibold text-gray-200">Mine Builds</h2>
-              <span class="bg-gray-700 text-gray-400 px-3 py-1 rounded-full text-xs font-medium">{{ builds.length }} builds</span>
+              <span class="count-badge">{{ builds.length }} builds</span>
             </div>
             <div class="flex items-center gap-4">
-              <select v-model="filter" class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 cursor-pointer">
+              <select v-model="filter" class="select-dropdown">
                 <option value="all">Alle builds</option>
                 <option value="poe1">Path of Exile 1</option>
                 <option value="poe2">Path of Exile 2</option>
@@ -64,7 +64,7 @@
                   v-model="inputSearchQuery" 
                   type="text" 
                   placeholder="Søg builds..." 
-                  class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 w-48 focus:outline-none focus:border-gray-200"
+                  class="input-search"
                 />
               </div>
             </div>
@@ -79,7 +79,7 @@
             <p>Tilføj dit første build for at komme i gang!</p>
           </div>
 
-          <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div v-else class="builds-grid">
             <BuildCard 
               v-for="build in filteredBuilds" 
               :key="build.id" 

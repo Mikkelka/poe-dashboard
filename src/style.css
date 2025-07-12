@@ -4,3 +4,99 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+/* =============================================================================
+   COMPONENT CLASSES - Using @apply to create reusable utility combinations
+   ============================================================================= */
+
+/* BUTTONS */
+.btn-google {
+  @apply flex items-center justify-center gap-3 bg-white text-gray-900 
+         border border-gray-300 px-6 py-3 rounded-lg text-sm font-medium 
+         cursor-pointer transition-all hover:bg-gray-100 hover:shadow-lg 
+         disabled:opacity-60 disabled:cursor-not-allowed w-full;
+}
+
+.btn-primary {
+  @apply bg-gray-200 text-gray-900 border-none px-5 py-3 rounded-lg 
+         text-sm font-medium cursor-pointer transition-all hover:bg-gray-300;
+}
+
+.btn-outline {
+  @apply bg-transparent text-gray-200 border border-gray-700 px-5 py-3 
+         rounded-lg text-sm font-medium cursor-pointer transition-all 
+         hover:border-gray-200;
+}
+
+.action-link {
+  @apply flex items-center gap-1.5 text-gray-200 text-sm font-medium 
+         transition-colors hover:text-gray-400 cursor-pointer;
+}
+
+/* CARDS & CONTAINERS */
+.auth-form {
+  @apply bg-gray-900 border border-gray-700 rounded-xl p-10 w-full 
+         max-w-md text-center;
+}
+
+.build-card {
+  @apply bg-gray-900 border border-gray-700 rounded-xl p-6 transition-all 
+         hover:border-gray-600 hover:-translate-y-0.5 hover:shadow-xl;
+}
+
+.container-main {
+  @apply max-w-6xl mx-auto px-6;
+}
+
+.header-full {
+  @apply bg-gray-900 border-b border-gray-700 py-6 mb-8 w-screen 
+         relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw];
+}
+
+.header-content {
+  @apply flex flex-col md:flex-row justify-between items-center 
+         max-w-6xl mx-auto px-4 md:px-6 gap-5 md:gap-0 
+         text-center md:text-left;
+}
+
+/* FORM ELEMENTS */
+.select-dropdown {
+  @apply bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 
+         text-sm text-gray-200 cursor-pointer;
+}
+
+.input-search {
+  @apply bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 
+         text-sm text-gray-200 w-48 focus:outline-none focus:border-gray-200;
+}
+
+/* STATUS INDICATORS */
+.game-badge {
+  @apply px-2 py-1 rounded text-xs font-semibold uppercase tracking-wide;
+}
+
+.guide-status {
+  @apply flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium;
+}
+
+.error-message {
+  @apply text-red-400 mt-4 text-sm p-3 bg-red-900/20 border 
+         border-red-800/50 rounded-lg;
+}
+
+.count-badge {
+  @apply bg-gray-700 text-gray-400 px-3 py-1 rounded-full text-xs font-medium;
+}
+
+/* LAYOUT */
+.builds-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6;
+}
+
+.section-header {
+  @apply flex justify-between items-center mb-8;
+}
+
+.header-actions {
+  @apply flex flex-col md:flex-row items-center gap-3 md:gap-4;
+}
