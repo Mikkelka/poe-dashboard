@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
+  <div id="app" class="w-full min-h-screen bg-black text-gray-200">
     <!-- Authentication Section -->
-    <div v-if="!user" class="auth-container">
-      <div class="auth-form">
-        <h1>PoE Tracker</h1>
-        <p>Log ind for at få adgang til dine builds</p>
+    <div v-if="!user" class="flex justify-center items-center min-h-screen p-5">
+      <div class="bg-gray-900 border border-gray-700 rounded-xl p-10 w-full max-w-md text-center">
+        <h1 class="text-gray-200 text-3xl font-bold mb-2">PoE Tracker</h1>
+        <p class="text-gray-400 mb-8">Log ind for at få adgang til dine builds</p>
         
-        <div class="auth-form-content">
+        <div class="flex flex-col gap-4">
           <button 
             @click="handleGoogleSignIn" 
-            class="btn-google" 
+            class="flex items-center justify-center gap-3 bg-white text-gray-900 border border-gray-300 px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all hover:bg-gray-100 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed w-full" 
             :disabled="loading"
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
@@ -22,14 +22,14 @@
           </button>
         </div>
         
-        <div v-if="authError" class="error-message">
+        <div v-if="authError" class="text-red-400 mt-4 text-sm p-3 bg-red-900/20 border border-red-800/50 rounded-lg">
           {{ authError }}
         </div>
       </div>
     </div>
 
     <!-- Main App Content -->
-    <div v-else class="container">
+    <div v-else class="max-w-6xl mx-auto px-6">
       <!-- Header -->
       <Header 
         :user="user" 
@@ -44,41 +44,42 @@
       />
 
       <!-- Main Content -->
-      <main class="main">
+      <main>
         <!-- Builds Section -->
-        <section v-if="activeTab === 'builds'" class="tab-content">
-          <div class="section-header">
-            <div class="section-title">
-              <h2>Mine Builds</h2>
-              <span class="count">{{ builds.length }} builds</span>
+        <section v-if="activeTab === 'builds'">
+          <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-3">
+              <h2 class="text-2xl font-semibold text-gray-200">Mine Builds</h2>
+              <span class="bg-gray-700 text-gray-400 px-3 py-1 rounded-full text-xs font-medium">{{ builds.length }} builds</span>
             </div>
-            <div class="filters">
-              <select v-model="filter" class="filter-dropdown">
+            <div class="flex items-center gap-4">
+              <select v-model="filter" class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 cursor-pointer">
                 <option value="all">Alle builds</option>
                 <option value="poe1">Path of Exile 1</option>
                 <option value="poe2">Path of Exile 2</option>
                 <option value="active">Kun aktive</option>
               </select>
-              <div class="search-box">
+              <div>
                 <input 
                   v-model="inputSearchQuery" 
                   type="text" 
                   placeholder="Søg builds..." 
+                  class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 w-48 focus:outline-none focus:border-gray-200"
                 />
               </div>
             </div>
           </div>
 
-          <div v-if="loading" class="loading">
+          <div v-if="loading" class="text-center py-16 text-gray-400">
             Indlæser builds...
           </div>
 
-          <div v-else-if="filteredBuilds.length === 0" class="empty-state">
-            <h3>Ingen builds fundet</h3>
+          <div v-else-if="filteredBuilds.length === 0" class="text-center py-16 text-gray-400">
+            <h3 class="text-gray-200 mb-2">Ingen builds fundet</h3>
             <p>Tilføj dit første build for at komme i gang!</p>
           </div>
 
-          <div v-else class="builds-grid">
+          <div v-else class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             <BuildCard 
               v-for="build in filteredBuilds" 
               :key="build.id" 
@@ -124,9 +125,13 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
-import { onAuthChange, signInWithGoogle, logoutUser, subscribeToUserBuilds, subscribeToUserResources, deleteResource, updateLastOpened, subscribeToUserPreferences, updateUserPreferences } from './firebase'
+import { onMounted } from 'vue'
 import { getStatusText, getGuideIndicator, getGuideText, formatLastOpened } from './utils/helpers'
+import { useAuth } from './composables/useAuth'
+import { useBuilds } from './composables/useBuilds'
+import { useResources } from './composables/useResources'
+import { useSearch } from './composables/useSearch'
+import { useTab } from './composables/useTab'
 import BuildModal from './components/BuildModal.vue'
 import ResourceModal from './components/ResourceModal.vue'
 import Header from './components/Header.vue'
@@ -145,739 +150,85 @@ export default {
     ResourcesSection
   },
   setup() {
-    // Authentication state
-    const user = ref(null)
-    const authError = ref('')
-    const loading = ref(false)
+    // Initialize composables
+    const auth = useAuth()
+    const builds = useBuilds()
+    const resources = useResources()
+    const search = useSearch(builds.builds)
+    const tab = useTab()
 
-    // App state
-    const activeTab = ref('builds')
-    const builds = ref([])
-    const filter = ref('all')
-    const inputSearchQuery = ref('')
-    const debouncedSearchQuery = ref('')
-    const showModal = ref(false)
-    const editingBuild = ref(null)
-    const showResourceModal = ref(false)
-    const editingResource = ref(null)
-    const customResources = ref([])
-    const hiddenResourceIds = ref([])
-    
-    let unsubscribeAuth = null
-    let unsubscribeBuilds = null
-    let unsubscribeResources = null
-    let unsubscribePreferences = null
-    let searchDebounceTimer = null
-
-    // Debounce search input
-    watch(inputSearchQuery, (newValue) => {
-      if (searchDebounceTimer) {
-        clearTimeout(searchDebounceTimer)
-      }
-      searchDebounceTimer = setTimeout(() => {
-        debouncedSearchQuery.value = newValue
-      }, 300)
-    })
-
-    // Authentication methods
-    const handleGoogleSignIn = async () => {
-      loading.value = true
-      authError.value = ''
-      
-      try {
-        const result = await signInWithGoogle()
-        
-        if (result.error) {
-          authError.value = result.error
-        }
-      } catch (error) {
-        authError.value = 'Der opstod en fejl under login. Prøv igen.'
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const handleLogout = async () => {
-      await logoutUser()
-    }
-
-    // Build management
-    const openAddBuildModal = () => {
-      editingBuild.value = null
-      showModal.value = true
-    }
-
-    const openEditBuildModal = async (build) => {
-      editingBuild.value = build
-      showModal.value = true
-      
-      // Update last opened timestamp
-      await updateLastOpened(build.id)
-    }
-
-    const handleLinkClicked = async (buildId) => {
-      // Update last opened timestamp when user clicks on build links
-      await updateLastOpened(buildId)
-    }
-
-    const closeModal = () => {
-      showModal.value = false
-      editingBuild.value = null
-    }
-
-    const handleBuildSaved = () => {
-      // Modal will be closed by closeModal
-      // Builds will be automatically updated via real-time subscription
-    }
-
-    // Computed properties
-    const filteredBuilds = computed(() => {
-      let filtered = builds.value
-
-      // Apply filter
-      if (filter.value !== 'all') {
-        if (filter.value === 'active') {
-          filtered = filtered.filter(build => build.buildStatus === 'active')
-        } else {
-          filtered = filtered.filter(build => build.gameVersion === filter.value)
-        }
-      }
-
-      // Apply search
-      if (debouncedSearchQuery.value) {
-        const query = debouncedSearchQuery.value.toLowerCase()
-        filtered = filtered.filter(build => 
-          build.buildName.toLowerCase().includes(query) ||
-          (build.characterName && build.characterName.toLowerCase().includes(query))
-        )
-      }
-
-      return filtered
-    })
-
-
-    // Resource management
-    const handleAddResource = () => {
-      editingResource.value = null
-      showResourceModal.value = true
-    }
-
-    const handleEditResource = (resource) => {
-      editingResource.value = resource
-      showResourceModal.value = true
-    }
-
-    const closeResourceModal = () => {
-      showResourceModal.value = false
-      editingResource.value = null
-    }
-
-    const handleResourceSaved = () => {
-      // Modal will be closed by closeResourceModal
-      // Resources will be automatically updated via real-time subscription
-    }
-
-    const handleDeleteResource = async (resourceId) => {
-      if (confirm('Er du sikker på, at du vil slette denne ressource?')) {
-        const result = await deleteResource(resourceId)
-        if (result.error) {
-          console.error('Error deleting resource:', result.error)
-        }
-      }
-    }
-
-    const handleHideResource = async (resourceId) => {
-      if (!hiddenResourceIds.value.includes(resourceId) && user.value) {
-        const newHiddenIds = [...hiddenResourceIds.value, resourceId]
-        await updateUserPreferences(user.value.uid, { hiddenResourceIds: newHiddenIds })
-      }
-    }
-
-    const handleRestoreResources = async () => {
-      if (user.value) {
-        await updateUserPreferences(user.value.uid, { hiddenResourceIds: [] })
-      }
-    }
-
-    // Lifecycle hooks
+    // Setup authentication state change handler
     onMounted(() => {
-      // Listen for auth state changes
-      unsubscribeAuth = onAuthChange((authUser) => {
-        user.value = authUser
+      auth.initializeAuth((authUser) => {
+        // Initialize data subscriptions when auth state changes
+        const userId = authUser?.uid || null
         
-        // Clean up existing subscriptions first
-        if (unsubscribeBuilds) {
-          unsubscribeBuilds()
-          unsubscribeBuilds = null
-        }
-        if (unsubscribeResources) {
-          unsubscribeResources()
-          unsubscribeResources = null
-        }
-        if (unsubscribePreferences) {
-          unsubscribePreferences()
-          unsubscribePreferences = null
-        }
+        // Initialize builds subscription
+        builds.initializeBuildsSubscription(userId)
         
-        if (authUser) {
-          // Subscribe to builds when user logs in
-          unsubscribeBuilds = subscribeToUserBuilds(authUser.uid, (userBuilds) => {
-            builds.value = userBuilds
-          })
-          
-          // Subscribe to resources when user logs in
-          unsubscribeResources = subscribeToUserResources(authUser.uid, (userResources) => {
-            customResources.value = userResources
-          })
-          
-          // Subscribe to user preferences when user logs in
-          unsubscribePreferences = subscribeToUserPreferences(authUser.uid, (preferences) => {
-            hiddenResourceIds.value = preferences.hiddenResourceIds || []
-          })
-        } else {
-          // Clear data when user logs out
-          builds.value = []
-          customResources.value = []
-          hiddenResourceIds.value = []
-        }
+        // Initialize resources subscriptions
+        resources.initializeResourcesSubscriptions(userId)
       })
     })
 
-    onUnmounted(() => {
-      if (unsubscribeAuth) unsubscribeAuth()
-      if (unsubscribeBuilds) unsubscribeBuilds()
-      if (unsubscribeResources) unsubscribeResources()
-      if (unsubscribePreferences) unsubscribePreferences()
-    })
+    // Wrapper methods to pass user context to resources
+    const handleHideResource = async (resourceId) => {
+      await resources.handleHideResource(resourceId, auth.user.value?.uid)
+    }
+
+    const handleRestoreResources = async () => {
+      await resources.handleRestoreResources(auth.user.value?.uid)
+    }
 
     return {
-      // Auth
-      user,
-      authError,
-      loading,
-      handleGoogleSignIn,
-      handleLogout,
+      // Authentication
+      user: auth.user,
+      authError: auth.authError,
+      loading: auth.loading,
+      handleGoogleSignIn: auth.handleGoogleSignIn,
+      handleLogout: auth.handleLogout,
       
-      // App state
-      activeTab,
-      builds,
-      filter,
-      inputSearchQuery,
-      showModal,
-      editingBuild,
-      filteredBuilds,
+      // Tab management
+      activeTab: tab.activeTab,
       
-      // Methods
-      openAddBuildModal,
-      openEditBuildModal,
-      handleLinkClicked,
-      closeModal,
-      handleBuildSaved,
-      handleAddResource,
-      handleEditResource,
-      closeResourceModal,
-      handleResourceSaved,
-      handleDeleteResource,
+      // Builds
+      builds: builds.builds,
+      showModal: builds.showModal,
+      editingBuild: builds.editingBuild,
+      openAddBuildModal: builds.openAddBuildModal,
+      openEditBuildModal: builds.openEditBuildModal,
+      handleLinkClicked: builds.handleLinkClicked,
+      closeModal: builds.closeModal,
+      handleBuildSaved: builds.handleBuildSaved,
+      
+      // Search and filtering
+      filter: search.filter,
+      inputSearchQuery: search.inputSearchQuery,
+      filteredBuilds: search.filteredBuilds,
+      
+      // Resources
+      customResources: resources.customResources,
+      hiddenResourceIds: resources.hiddenResourceIds,
+      showResourceModal: resources.showResourceModal,
+      editingResource: resources.editingResource,
+      handleAddResource: resources.handleAddResource,
+      handleEditResource: resources.handleEditResource,
+      closeResourceModal: resources.closeResourceModal,
+      handleResourceSaved: resources.handleResourceSaved,
+      handleDeleteResource: resources.handleDeleteResource,
       handleHideResource,
       handleRestoreResources,
+      
+      // Helper methods
       getStatusText,
       getGuideIndicator,
       getGuideText,
-      formatLastOpened,
-      
-      // Resource state
-      showResourceModal,
-      editingResource,
-      customResources,
-      hiddenResourceIds
+      formatLastOpened
     }
   }
 }
 </script>
 
 <style scoped>
-/* Authentication Styles */
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.auth-form {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 12px;
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.auth-form h1 {
-  color: #e5e5e5;
-  font-size: 2rem;
-  margin-bottom: 8px;
-}
-
-.auth-form p {
-  color: #999999;
-  margin-bottom: 32px;
-}
-
-.auth-form-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.form-group input {
-  width: 100%;
-  background: #0f0f0f;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 12px;
-  color: #e5e5e5;
-  font-size: 0.9rem;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #e5e5e5;
-}
-
-.form-group input::placeholder {
-  color: #666666;
-}
-
-.btn-primary {
-  background: #e5e5e5;
-  color: #1a1a1a;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #cccccc;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: #999999;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 0.9rem;
-  margin-top: 16px;
-}
-
-.btn-link:hover {
-  color: #e5e5e5;
-}
-
-.btn-google {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: #ffffff;
-  color: #1f1f1f;
-  border: 1px solid #dadce0;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 100%;
-}
-
-.btn-google:hover:not(:disabled) {
-  box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
-  background: #f8f9fa;
-}
-
-.btn-google:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.error-message {
-  color: #ff6b6b;
-  margin-top: 16px;
-  font-size: 0.9rem;
-}
-
-/* Main App Styles */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.header {
-  background: #1a1a1a;
-  border-bottom: 1px solid #333333;
-  padding: 24px 0;
-  margin-bottom: 32px;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #e5e5e5;
-  margin-bottom: 4px;
-}
-
-.brand p {
-  color: #999999;
-  font-size: 0.95rem;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.user-welcome {
-  color: #999999;
-  font-size: 0.9rem;
-}
-
-.btn-outline {
-  background: transparent;
-  color: #e5e5e5;
-  border: 1px solid #333333;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-outline:hover {
-  border-color: #e5e5e5;
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  border-bottom: 1px solid #333333;
-  margin-bottom: 40px;
-}
-
-.tab {
-  background: none;
-  border: none;
-  padding: 16px 24px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #999999;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.tab:hover {
-  color: #e5e5e5;
-}
-
-.tab.active {
-  color: #e5e5e5;
-  border-bottom-color: #e5e5e5;
-}
-
-/* Section Header */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.section-title h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #e5e5e5;
-}
-
-.count {
-  background: #333333;
-  color: #999999;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.filters {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.filter-dropdown {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  color: #e5e5e5;
-  cursor: pointer;
-}
-
-.search-box input {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  color: #e5e5e5;
-  width: 200px;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #e5e5e5;
-}
-
-/* Loading and Empty States */
-.loading,
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999999;
-}
-
-.empty-state h3 {
-  color: #e5e5e5;
-  margin-bottom: 8px;
-}
-
-/* Builds Grid */
-.builds-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 24px;
-}
-
-.build-card {
-  background: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.2s ease;
-}
-
-.build-card:hover {
-  border-color: #555555;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.build-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.build-info h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #e5e5e5;
-  margin-bottom: 8px;
-}
-
-.build-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.game-badge {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.game-badge.poe1 {
-  background: #fff3e0;
-  color: #f57c00;
-}
-
-.game-badge.poe2 {
-  background: #e8f5e8;
-  color: #2e7d32;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.status-dot.active {
-  background: #4caf50;
-}
-
-.status-dot.paused {
-  background: #ff9800;
-}
-
-.status-dot.completed {
-  background: #2196f3;
-}
-
-.status-text {
-  font-size: 0.8rem;
-  color: #999999;
-}
-
-.build-status {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.guide-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.guide-status.up-to-date {
-  background: rgba(76, 175, 80, 0.15);
-  color: #4caf50;
-}
-
-.guide-status.outdated {
-  background: rgba(255, 152, 0, 0.15);
-  color: #ff9800;
-}
-
-.guide-status.unknown {
-  background: rgba(158, 158, 158, 0.15);
-  color: #9e9e9e;
-}
-
-/* Build Details */
-.build-details {
-  margin-bottom: 20px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.detail-item .label {
-  color: #999999;
-  font-size: 0.9rem;
-}
-
-.detail-item .value {
-  color: #e5e5e5;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-/* Build Actions */
-.build-actions {
-  display: flex;
-  gap: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #333333;
-}
-
-.action-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #e5e5e5;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.action-link:hover {
-  color: #999999;
-}
-
-
-/* Responsive */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 16px;
-  }
-  
-  .header-content {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-  }
-  
-  .header-actions {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .section-header {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-  }
-  
-  .filters {
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-  }
-  
-  .search-box input {
-    width: 100%;
-  }
-  
-  .builds-grid {
-    grid-template-columns: 1fr;
-  }
-}
+/* All styles converted to Tailwind CSS classes */
 </style>

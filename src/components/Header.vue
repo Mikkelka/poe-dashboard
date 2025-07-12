@@ -1,14 +1,14 @@
 <template>
-  <header class="header">
-    <div class="header-content">
-      <div class="brand">
-        <h1>PoE Tracker</h1>
-        <p>Simpel og overskuelig build tracking</p>
+  <header class="bg-gray-900 border-b border-gray-700 py-6 mb-8 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+    <div class="flex flex-col md:flex-row justify-between items-center max-w-6xl mx-auto px-4 md:px-6 gap-5 md:gap-0 text-center md:text-left">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-200 mb-1">PoE Tracker</h1>
+        <p class="text-gray-400 text-base">Simpel og overskuelig build tracking</p>
       </div>
-      <div class="header-actions">
-        <span class="user-welcome">Hej, {{ user.displayName || user.email }}!</span>
-        <button @click="$emit('logout')" class="btn-outline">Log ud</button>
-        <button @click="$emit('new-build')" class="btn-primary">+ Ny Build</button>
+      <div class="flex flex-col md:flex-row items-center gap-3 md:gap-4">
+        <span class="text-gray-400 text-sm">Hej, {{ user.displayName || user.email }}!</span>
+        <button @click="$emit('logout')" class="bg-transparent text-gray-200 border border-gray-700 px-5 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all hover:border-gray-200">Log ud</button>
+        <button @click="$emit('new-build')" class="bg-gray-200 text-gray-900 border-none px-5 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all hover:bg-gray-300">+ Ny Build</button>
       </div>
     </div>
   </header>
@@ -28,100 +28,5 @@ export default {
 </script>
 
 <style scoped>
-.header {
-  background: #1a1a1a;
-  border-bottom: 1px solid #333333;
-  padding: 24px 0;
-  margin-bottom: 32px;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.brand h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #e5e5e5;
-  margin-bottom: 4px;
-}
-
-.brand p {
-  color: #999999;
-  font-size: 0.95rem;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.user-welcome {
-  color: #999999;
-  font-size: 0.9rem;
-}
-
-.btn-outline {
-  background: transparent;
-  color: #e5e5e5;
-  border: 1px solid #333333;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-outline:hover {
-  border-color: #e5e5e5;
-}
-
-.btn-primary {
-  background: #e5e5e5;
-  color: #1a1a1a;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #cccccc;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-    padding: 0 16px;
-  }
-  
-  .header-actions {
-    flex-direction: column;
-    gap: 12px;
-  }
-}
+/* All styles converted to Tailwind CSS classes */
 </style>
