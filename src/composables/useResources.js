@@ -1,9 +1,7 @@
 import { ref, onUnmounted } from 'vue'
 import { 
   subscribeToUserResources, 
-  subscribeToUserPreferences, 
-  deleteResource, 
-  updateUserPreferences 
+  deleteResource
 } from '../firebase'
 
 export function useResources() {
@@ -16,7 +14,9 @@ export function useResources() {
   
   // Subscription cleanup functions
   let unsubscribeResources = null
-  let unsubscribePreferences = null
+  
+  // localStorage key for hidden resources
+  const HIDDEN_RESOURCES_KEY = 'poe-dashboard-hidden-resources'
 
   // Modal management
   const handleAddResource = () => {
@@ -49,20 +49,38 @@ export function useResources() {
     }
   }
 
-  const handleHideResource = async (resourceId, userId) => {
-    if (!hiddenResourceIds.value.includes(resourceId) && userId) {
+  // localStorage helper functions
+  const getHiddenResourceIds = () => {
+    try {
+      const stored = localStorage.getItem(HIDDEN_RESOURCES_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch (error) {
+      console.warn('Error reading hidden resources from localStorage:', error)
+      return []
+    }
+  }
+
+  const setHiddenResourceIds = (ids) => {
+    try {
+      localStorage.setItem(HIDDEN_RESOURCES_KEY, JSON.stringify(ids))
+      hiddenResourceIds.value = ids
+    } catch (error) {
+      console.warn('Error saving hidden resources to localStorage:', error)
+    }
+  }
+
+  const handleHideResource = (resourceId) => {
+    if (!hiddenResourceIds.value.includes(resourceId)) {
       const newHiddenIds = [...hiddenResourceIds.value, resourceId]
-      await updateUserPreferences(userId, { hiddenResourceIds: newHiddenIds })
+      setHiddenResourceIds(newHiddenIds)
     }
   }
 
-  const handleRestoreResources = async (userId) => {
-    if (userId) {
-      await updateUserPreferences(userId, { hiddenResourceIds: [] })
-    }
+  const handleRestoreResources = () => {
+    setHiddenResourceIds([])
   }
 
-  // Initialize resources and preferences subscriptions for authenticated user
+  // Initialize resources subscriptions for authenticated user
   const initializeResourcesSubscriptions = (userId) => {
     // Clean up existing subscriptions
     cleanupResourcesSubscriptions()
@@ -76,10 +94,8 @@ export function useResources() {
         loading.value = false
       })
       
-      // Subscribe to user preferences
-      unsubscribePreferences = subscribeToUserPreferences(userId, (preferences) => {
-        hiddenResourceIds.value = preferences.hiddenResourceIds || []
-      })
+      // Load hidden resources from localStorage
+      hiddenResourceIds.value = getHiddenResourceIds()
     } else {
       // Clear data when no user
       customResources.value = []
@@ -93,10 +109,6 @@ export function useResources() {
     if (unsubscribeResources) {
       unsubscribeResources()
       unsubscribeResources = null
-    }
-    if (unsubscribePreferences) {
-      unsubscribePreferences()
-      unsubscribePreferences = null
     }
     customResources.value = []
     hiddenResourceIds.value = []

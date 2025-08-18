@@ -173,13 +173,13 @@ export default {
       })
     })
 
-    // Wrapper methods to pass user context to resources
-    const handleHideResource = async (resourceId) => {
-      await resources.handleHideResource(resourceId, auth.user.value?.uid)
+    // Resource methods - no longer need userId since using localStorage
+    const handleHideResource = (resourceId) => {
+      resources.handleHideResource(resourceId)
     }
 
-    const handleRestoreResources = async () => {
-      await resources.handleRestoreResources(auth.user.value?.uid)
+    const handleRestoreResources = () => {
+      resources.handleRestoreResources()
     }
 
     const handleDeleteBuild = async (build) => {
