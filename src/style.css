@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 /* Custom base styles that extend Tailwind */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -139,53 +140,3 @@ body {
   @apply p-6;
 }
 
-/* LOADING COMPONENTS */
-.loading-skeleton {
-  @apply bg-slate-700/50 animate-pulse rounded;
-}
-
-.loading-skeleton-text {
-  @apply bg-slate-700/50 animate-pulse rounded h-4;
-}
-
-.loading-skeleton-avatar {
-  @apply bg-slate-700/50 animate-pulse rounded-full;
-}
-
-.loading-card {
-  @apply bg-slate-800/30 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 
-         animate-pulse;
-}
-
-.loading-shimmer {
-  @apply relative overflow-hidden bg-slate-700/50 rounded;
-}
-
-.loading-shimmer::after {
-  @apply absolute inset-0 -translate-x-full bg-gradient-to-r 
-         from-transparent via-white/10 to-transparent animate-shimmer;
-  content: '';
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.btn-loading {
-  @apply relative overflow-hidden;
-}
-
-.btn-loading::after {
-  @apply absolute inset-0 bg-gradient-to-r from-transparent 
-         via-white/20 to-transparent animate-shimmer;
-  content: '';
-}
-
-.page-loading {
-  @apply flex flex-col items-center justify-center min-h-[400px] space-y-4;
-}

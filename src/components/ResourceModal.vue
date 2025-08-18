@@ -1,9 +1,9 @@
 <template>
-  <div v-if="show" class="modal-overlay" @click="handleOverlayClick">
+  <div v-if="show" class="modal-overlay">
     <div class="modal glass-modal" @click.stop>
       <div class="modal-header">
         <h3>{{ editingResource ? 'Rediger Ressource' : 'Tilføj Ny Ressource' }}</h3>
-        <button class="modal-close" @click="closeModal">&times;</button>
+        <button class="modal-close" @click="handleCloseClick">&times;</button>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-content">
@@ -120,16 +120,14 @@
         </div>
 
         <div class="flex gap-3 justify-end mt-8 pt-5 border-t border-slate-600/40">
-          <button type="button" class="btn-outline" @click="closeModal" :disabled="loading">
+          <button type="button" class="btn-outline" @click="handleCloseClick" :disabled="loading">
             Annuller
           </button>
           <button 
             type="submit" 
             class="btn-primary" 
-            :class="{ 'btn-loading': loading }"
             :disabled="loading"
           >
-            <div v-if="loading" class="w-4 h-4 border-2 border-gray-600 border-t-gray-900 rounded-full animate-spin mr-2"></div>
             {{ loading ? 'Gemmer...' : (editingResource ? 'Gem Ændringer' : 'Gem Ressource') }}
           </button>
         </div>
@@ -139,7 +137,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { addResource, updateResource } from '../firebase'
 import { useValidation, resourceValidationRules } from '../composables/useValidation'
 
@@ -253,14 +251,46 @@ export default {
         Object.assign(formData, defaultFormData)
       }
       error.value = ''
+      validation.clearErrors()
       emit('close')
     }
 
-    const handleOverlayClick = (event) => {
-      if (event.target === event.currentTarget) {
+    // Check if form has been modified
+    const isFormDirty = computed(() => {
+      // If editing, compare with original data
+      if (props.editingResource) {
+        return (
+          formData.title !== (props.editingResource.title || '') ||
+          formData.description !== (props.editingResource.description || '') ||
+          formData.url !== (props.editingResource.url || '') ||
+          formData.icon !== (props.editingResource.icon || '🔧') ||
+          formData.category !== (props.editingResource.category || '')
+        )
+      }
+      
+      // If creating new, check if any fields are filled
+      return (
+        formData.title.trim() !== '' ||
+        formData.description.trim() !== '' ||
+        formData.url.trim() !== '' ||
+        formData.icon !== '🔧' ||
+        formData.category !== ''
+      )
+    })
+
+    const handleCloseClick = () => {
+      // If form has changes, show confirmation dialog
+      if (isFormDirty.value) {
+        const confirmed = window.confirm('Du har ugemte ændringer. Er du sikker på, at du vil lukke uden at gemme?')
+        if (confirmed) {
+          closeModal()
+        }
+      } else {
+        // No changes, close immediately
         closeModal()
       }
     }
+
 
     return {
       formData,
@@ -269,9 +299,10 @@ export default {
       validation,
       resourceValidationRules,
       commonEmojis,
+      isFormDirty,
       handleSubmit,
       closeModal,
-      handleOverlayClick
+      handleCloseClick
     }
   }
 }

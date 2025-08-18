@@ -1,9 +1,9 @@
 <template>
-  <div v-if="show" class="modal-overlay" @click="handleOverlayClick">
+  <div v-if="show" class="modal-overlay">
     <div class="modal glass-modal" @click.stop>
       <div class="modal-header">
         <h3>{{ editingBuild ? 'Rediger Build' : 'Tilføj Nyt Build' }}</h3>
-        <button class="modal-close" @click="closeModal">&times;</button>
+        <button class="modal-close" @click="handleCloseClick">&times;</button>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-content">
@@ -155,16 +155,14 @@
         </div>
 
         <div class="flex gap-3 justify-end mt-8 pt-5 border-t border-slate-600/40">
-          <button type="button" class="btn-outline" @click="closeModal" :disabled="loading">
+          <button type="button" class="btn-outline" @click="handleCloseClick" :disabled="loading">
             Annuller
           </button>
           <button 
             type="submit" 
             class="btn-primary" 
-            :class="{ 'btn-loading': loading }"
             :disabled="loading"
           >
-            <div v-if="loading" class="w-4 h-4 border-2 border-gray-600 border-t-gray-900 rounded-full animate-spin mr-2"></div>
             {{ loading ? 'Gemmer...' : (editingBuild ? 'Gem Ændringer' : 'Gem Build') }}
           </button>
         </div>
@@ -174,7 +172,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { addBuild, updateBuild } from '../firebase'
 import { useValidation, buildValidationRules } from '../composables/useValidation'
 
@@ -293,14 +291,52 @@ export default {
         Object.assign(formData, defaultFormData)
       }
       error.value = ''
+      validation.clearErrors()
       emit('close')
     }
 
-    const handleOverlayClick = (event) => {
-      if (event.target === event.currentTarget) {
+    const handleCloseClick = () => {
+      // If form has changes, show confirmation dialog
+      if (isFormDirty.value) {
+        const confirmed = window.confirm('Du har ugemte ændringer. Er du sikker på, at du vil lukke uden at gemme?')
+        if (confirmed) {
+          closeModal()
+        }
+      } else {
+        // No changes, close immediately
         closeModal()
       }
     }
+
+    // Check if form has been modified
+    const isFormDirty = computed(() => {
+      // If editing, compare with original data
+      if (props.editingBuild) {
+        return (
+          formData.buildName !== (props.editingBuild.buildName || '') ||
+          formData.gameVersion !== (props.editingBuild.gameVersion || '') ||
+          formData.characterName !== (props.editingBuild.characterName || '') ||
+          formData.league !== (props.editingBuild.league || '') ||
+          formData.buildStatus !== (props.editingBuild.buildStatus || 'active') ||
+          formData.guideStatus !== (props.editingBuild.guideStatus || 'unknown') ||
+          formData.pobLink !== (props.editingBuild.pobLink || '') ||
+          formData.guideLink !== (props.editingBuild.guideLink || '') ||
+          formData.notes !== (props.editingBuild.notes || '')
+        )
+      }
+      
+      // If creating new, check if any required fields are filled
+      return (
+        formData.buildName.trim() !== '' ||
+        formData.gameVersion !== '' ||
+        formData.characterName.trim() !== '' ||
+        formData.league.trim() !== '' ||
+        formData.pobLink.trim() !== '' ||
+        formData.guideLink.trim() !== '' ||
+        formData.notes.trim() !== ''
+      )
+    })
+
 
     return {
       formData,
@@ -308,9 +344,10 @@ export default {
       error,
       validation,
       buildValidationRules,
+      isFormDirty,
       handleSubmit,
       closeModal,
-      handleOverlayClick
+      handleCloseClick
     }
   }
 }

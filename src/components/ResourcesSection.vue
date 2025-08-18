@@ -17,13 +17,8 @@
       </div>
     </div>
     
-    <div v-if="loading" class="space-y-10">
-      <div v-for="category in 4" :key="category" class="space-y-5">
-        <div class="loading-skeleton h-8 w-48 mb-5"></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <SkeletonLoader v-for="n in 6" :key="n" type="resource-card" />
-        </div>
-      </div>
+    <div v-if="loading" class="text-center py-16 text-gray-400">
+      Indlæser ressourcer...
     </div>
     
     <div v-else-if="visibleResources.length === 0" class="empty-state">
@@ -87,7 +82,6 @@
 <script setup>
 import { computed } from 'vue'
 import { defaultResources, categoryOrder } from '../data/resources.js'
-import SkeletonLoader from './SkeletonLoader.vue'
 
 const props = defineProps({
   resources: {
