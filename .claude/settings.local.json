@@ -12,7 +12,10 @@
       "Bash(timeout 8 npm run dev)",
       "Bash(npm run lint)",
       "Bash(mv:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npm update)",
+      "Bash(npm outdated)",
+      "Bash(npm audit:*)"
     ],
     "deny": []
   }
