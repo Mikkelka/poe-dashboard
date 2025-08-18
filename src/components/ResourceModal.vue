@@ -16,18 +16,34 @@
               id="title"
               placeholder="PoE Planner" 
               required
-              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+              @blur="validation.validateField('title', formData.title, resourceValidationRules.title.rules, resourceValidationRules.title.displayName)"
+              @input="validation.clearFieldError('title')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+              :class="validation.hasError('title') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
             />
+            <div v-if="validation.hasError('title')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('title') }}
+            </div>
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="category" class="text-gray-200 text-sm font-medium">Kategori *</label>
-            <select v-model="formData.category" id="category" required class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors">
+            <select 
+              v-model="formData.category" 
+              id="category" 
+              required
+              @change="validation.clearFieldError('category')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors"
+              :class="validation.hasError('category') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
+            >
               <option value="">Vælg kategori</option>
               <option value="Path of Exile 1">Path of Exile 1</option>
               <option value="Path of Exile 2">Path of Exile 2</option>
               <option value="Programs">Programs</option>
               <option value="Community">Community</option>
             </select>
+            <div v-if="validation.hasError('category')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('category') }}
+            </div>
           </div>
         </div>
 
@@ -39,8 +55,14 @@
             id="description"
             placeholder="Detaljeret build planlægning værktøj"
             required
-            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+            @blur="validation.validateField('description', formData.description, resourceValidationRules.description.rules, resourceValidationRules.description.displayName)"
+            @input="validation.clearFieldError('description')"
+            class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+            :class="validation.hasError('description') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
           />
+          <div v-if="validation.hasError('description')" class="text-red-400 text-xs mt-1">
+            {{ validation.getError('description') }}
+          </div>
         </div>
 
         <div class="flex flex-col gap-1.5 mb-5">
@@ -51,8 +73,14 @@
             id="url"
             placeholder="https://example.com"
             required
-            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+            @blur="validation.validateField('url', formData.url, resourceValidationRules.url.rules, resourceValidationRules.url.displayName)"
+            @input="validation.clearFieldError('url')"
+            class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+            :class="validation.hasError('url') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
           />
+          <div v-if="validation.hasError('url')" class="text-red-400 text-xs mt-1">
+            {{ validation.getError('url') }}
+          </div>
         </div>
 
         <div class="flex flex-col gap-1.5 mb-5">
@@ -63,9 +91,15 @@
               type="text" 
               id="icon"
               placeholder="🔧"
-              maxlength="2"
-              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500 w-20 text-center text-lg"
+              maxlength="4"
+              @blur="validation.validateField('icon', formData.icon, resourceValidationRules.icon.rules, resourceValidationRules.icon.displayName)"
+              @input="validation.clearFieldError('icon')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500 w-20 text-center text-lg"
+              :class="validation.hasError('icon') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
             />
+            <div v-if="validation.hasError('icon')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('icon') }}
+            </div>
             <div class="grid grid-cols-10 gap-2 p-3 bg-slate-900/50 border border-slate-600/50 rounded-lg max-h-40 overflow-y-auto">
               <button 
                 v-for="emoji in commonEmojis" 
@@ -89,7 +123,13 @@
           <button type="button" class="btn-outline" @click="closeModal" :disabled="loading">
             Annuller
           </button>
-          <button type="submit" class="btn-primary" :disabled="loading">
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            :class="{ 'btn-loading': loading }"
+            :disabled="loading"
+          >
+            <div v-if="loading" class="w-4 h-4 border-2 border-gray-600 border-t-gray-900 rounded-full animate-spin mr-2"></div>
             {{ loading ? 'Gemmer...' : (editingResource ? 'Gem Ændringer' : 'Gem Ressource') }}
           </button>
         </div>
@@ -101,6 +141,7 @@
 <script>
 import { ref, reactive, watch } from 'vue'
 import { addResource, updateResource } from '../firebase'
+import { useValidation, resourceValidationRules } from '../composables/useValidation'
 
 export default {
   name: 'ResourceModal',
@@ -122,6 +163,7 @@ export default {
   setup(props, { emit }) {
     const loading = ref(false)
     const error = ref('')
+    const validation = useValidation()
 
     // Common emojis for quick selection
     const commonEmojis = ['🔧', '📊', '💰', '📈', '🆕', '📚', '📋', '⚡', '🔄', '💬', '🗨️', '📖', '🏗️', '🎮', '⚔️', '🛡️', '💎', '🎯', '📝', '🔍']
@@ -159,10 +201,19 @@ export default {
     watch(() => props.show, (isShowing) => {
       if (!isShowing) {
         error.value = ''
+        validation.clearErrors()
       }
     })
 
     const handleSubmit = async () => {
+      // Validate form before submission
+      const isValid = validation.validate(formData, resourceValidationRules)
+      
+      if (!isValid) {
+        error.value = 'Ret venligst fejlene i formularen'
+        return
+      }
+
       loading.value = true
       error.value = ''
 
@@ -184,6 +235,7 @@ export default {
           // Reset form for new resources only
           if (!props.editingResource) {
             Object.assign(formData, defaultFormData)
+            validation.clearErrors()
           }
           closeModal()
         }
@@ -214,6 +266,8 @@ export default {
       formData,
       loading,
       error,
+      validation,
+      resourceValidationRules,
       commonEmojis,
       handleSubmit,
       closeModal,

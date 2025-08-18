@@ -16,16 +16,32 @@
               id="buildName"
               placeholder="Lightning Strike Champion" 
               required
-              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+              @blur="validation.validateField('buildName', formData.buildName, buildValidationRules.buildName.rules, buildValidationRules.buildName.displayName)"
+              @input="validation.clearFieldError('buildName')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+              :class="validation.hasError('buildName') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
             />
+            <div v-if="validation.hasError('buildName')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('buildName') }}
+            </div>
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="gameVersion" class="text-gray-200 text-sm font-medium">Spil *</label>
-            <select v-model="formData.gameVersion" id="gameVersion" required class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors">
+            <select 
+              v-model="formData.gameVersion" 
+              id="gameVersion" 
+              required
+              @change="validation.clearFieldError('gameVersion')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors"
+              :class="validation.hasError('gameVersion') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
+            >
               <option value="">Vælg spil</option>
               <option value="poe1">Path of Exile 1</option>
               <option value="poe2">Path of Exile 2</option>
             </select>
+            <div v-if="validation.hasError('gameVersion')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('gameVersion') }}
+            </div>
           </div>
         </div>
 
@@ -37,8 +53,14 @@
               type="text" 
               id="characterName"
               placeholder="StormWarrior"
-              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+              @blur="validation.validateField('characterName', formData.characterName, buildValidationRules.characterName.rules, buildValidationRules.characterName.displayName)"
+              @input="validation.clearFieldError('characterName')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+              :class="validation.hasError('characterName') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
             />
+            <div v-if="validation.hasError('characterName')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('characterName') }}
+            </div>
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="league" class="text-gray-200 text-sm font-medium">League</label>
@@ -47,8 +69,14 @@
               type="text" 
               id="league"
               placeholder="Early Access"
-              class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+              @blur="validation.validateField('league', formData.league, buildValidationRules.league.rules, buildValidationRules.league.displayName)"
+              @input="validation.clearFieldError('league')"
+              class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+              :class="validation.hasError('league') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
             />
+            <div v-if="validation.hasError('league')" class="text-red-400 text-xs mt-1">
+              {{ validation.getError('league') }}
+            </div>
           </div>
         </div>
 
@@ -78,8 +106,14 @@
             type="url" 
             id="pobLink"
             placeholder="https://pobb.in/..."
-            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+            @blur="validation.validateField('pobLink', formData.pobLink, buildValidationRules.pobLink.rules, buildValidationRules.pobLink.displayName)"
+            @input="validation.clearFieldError('pobLink')"
+            class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+            :class="validation.hasError('pobLink') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
           />
+          <div v-if="validation.hasError('pobLink')" class="text-red-400 text-xs mt-1">
+            {{ validation.getError('pobLink') }}
+          </div>
         </div>
 
         <div class="flex flex-col gap-1.5 mb-5">
@@ -89,8 +123,14 @@
             type="url" 
             id="guideLink"
             placeholder="https://maxroll.gg/..."
-            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500"
+            @blur="validation.validateField('guideLink', formData.guideLink, buildValidationRules.guideLink.rules, buildValidationRules.guideLink.displayName)"
+            @input="validation.clearFieldError('guideLink')"
+            class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500"
+            :class="validation.hasError('guideLink') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
           />
+          <div v-if="validation.hasError('guideLink')" class="text-red-400 text-xs mt-1">
+            {{ validation.getError('guideLink') }}
+          </div>
         </div>
 
         <div class="flex flex-col gap-1.5 mb-5">
@@ -100,8 +140,14 @@
             id="notes"
             rows="3" 
             placeholder="Ekstra noter om buildet..."
-            class="bg-slate-900/50 border border-slate-600/50 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-slate-400 transition-colors placeholder:text-gray-500 resize-none"
+            @blur="validation.validateField('notes', formData.notes, buildValidationRules.notes.rules, buildValidationRules.notes.displayName)"
+            @input="validation.clearFieldError('notes')"
+            class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500 resize-none"
+            :class="validation.hasError('notes') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
           ></textarea>
+          <div v-if="validation.hasError('notes')" class="text-red-400 text-xs mt-1">
+            {{ validation.getError('notes') }}
+          </div>
         </div>
 
         <div v-if="error" class="error-message">
@@ -112,7 +158,13 @@
           <button type="button" class="btn-outline" @click="closeModal" :disabled="loading">
             Annuller
           </button>
-          <button type="submit" class="btn-primary" :disabled="loading">
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            :class="{ 'btn-loading': loading }"
+            :disabled="loading"
+          >
+            <div v-if="loading" class="w-4 h-4 border-2 border-gray-600 border-t-gray-900 rounded-full animate-spin mr-2"></div>
             {{ loading ? 'Gemmer...' : (editingBuild ? 'Gem Ændringer' : 'Gem Build') }}
           </button>
         </div>
@@ -124,6 +176,7 @@
 <script>
 import { ref, reactive, watch } from 'vue'
 import { addBuild, updateBuild } from '../firebase'
+import { useValidation, buildValidationRules } from '../composables/useValidation'
 
 export default {
   name: 'BuildModal',
@@ -145,6 +198,7 @@ export default {
   setup(props, { emit }) {
     const loading = ref(false)
     const error = ref('')
+    const validation = useValidation()
 
     // Form data
     const defaultFormData = {
@@ -187,10 +241,19 @@ export default {
     watch(() => props.show, (isShowing) => {
       if (!isShowing) {
         error.value = ''
+        validation.clearErrors()
       }
     })
 
     const handleSubmit = async () => {
+      // Validate form before submission
+      const isValid = validation.validate(formData, buildValidationRules)
+      
+      if (!isValid) {
+        error.value = 'Ret venligst fejlene i formularen'
+        return
+      }
+
       loading.value = true
       error.value = ''
 
@@ -212,6 +275,7 @@ export default {
           // Reset form for new builds only
           if (!props.editingBuild) {
             Object.assign(formData, defaultFormData)
+            validation.clearErrors()
           }
           closeModal()
         }
@@ -242,6 +306,8 @@ export default {
       formData,
       loading,
       error,
+      validation,
+      buildValidationRules,
       handleSubmit,
       closeModal,
       handleOverlayClick

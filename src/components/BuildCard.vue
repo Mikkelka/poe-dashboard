@@ -74,6 +74,12 @@
           <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
+      <button @click="$emit('delete-build', build)" class="action-link bg-none border-none text-red-400 hover:text-red-300">
+        <span>Slet</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 </template>
@@ -88,7 +94,7 @@ defineProps({
   }
 })
 
-defineEmits(['edit-build', 'link-clicked'])
+defineEmits(['edit-build', 'link-clicked', 'delete-build'])
 </script>
 
 <style scoped>

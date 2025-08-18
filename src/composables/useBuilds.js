@@ -1,5 +1,5 @@
 import { ref, onUnmounted } from 'vue'
-import { subscribeToUserBuilds, updateLastOpened } from '../firebase'
+import { subscribeToUserBuilds, updateLastOpened, deleteBuild } from '../firebase'
 
 export function useBuilds() {
   // Builds state
@@ -37,6 +37,27 @@ export function useBuilds() {
   const handleLinkClicked = async (buildId) => {
     // Update last opened timestamp when user clicks on build links
     await updateLastOpened(buildId)
+  }
+
+  const handleDeleteBuild = async (buildId, buildName) => {
+    // Confirm deletion
+    const confirmed = window.confirm(`Er du sikker på, at du vil slette "${buildName}"? Denne handling kan ikke fortrydes.`)
+    
+    if (!confirmed) {
+      return { success: false, error: null }
+    }
+
+    try {
+      const result = await deleteBuild(buildId)
+      if (result.error) {
+        console.error('Error deleting build:', result.error)
+        return { success: false, error: 'Kunne ikke slette build. Prøv igen.' }
+      }
+      return { success: true, error: null }
+    } catch (error) {
+      console.error('Error deleting build:', error)
+      return { success: false, error: 'Kunne ikke slette build. Prøv igen.' }
+    }
   }
 
   // Initialize builds subscription for authenticated user
@@ -80,6 +101,7 @@ export function useBuilds() {
     closeModal,
     handleBuildSaved,
     handleLinkClicked,
+    handleDeleteBuild,
     initializeBuildsSubscription,
     cleanupBuildsSubscription
   }

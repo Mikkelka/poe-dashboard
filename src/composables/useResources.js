@@ -12,6 +12,7 @@ export function useResources() {
   const hiddenResourceIds = ref([])
   const showResourceModal = ref(false)
   const editingResource = ref(null)
+  const loading = ref(false)
   
   // Subscription cleanup functions
   let unsubscribeResources = null
@@ -67,9 +68,12 @@ export function useResources() {
     cleanupResourcesSubscriptions()
     
     if (userId) {
+      loading.value = true
+      
       // Subscribe to user resources
       unsubscribeResources = subscribeToUserResources(userId, (userResources) => {
         customResources.value = userResources
+        loading.value = false
       })
       
       // Subscribe to user preferences
@@ -80,6 +84,7 @@ export function useResources() {
       // Clear data when no user
       customResources.value = []
       hiddenResourceIds.value = []
+      loading.value = false
     }
   }
 
@@ -108,6 +113,7 @@ export function useResources() {
     hiddenResourceIds,
     showResourceModal,
     editingResource,
+    loading,
     
     // Methods
     handleAddResource,

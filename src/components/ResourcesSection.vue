@@ -17,7 +17,16 @@
       </div>
     </div>
     
-    <div v-if="visibleResources.length === 0" class="empty-state">
+    <div v-if="loading" class="space-y-10">
+      <div v-for="category in 4" :key="category" class="space-y-5">
+        <div class="loading-skeleton h-8 w-48 mb-5"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <SkeletonLoader v-for="n in 6" :key="n" type="resource-card" />
+        </div>
+      </div>
+    </div>
+    
+    <div v-else-if="visibleResources.length === 0" class="empty-state">
       <h3>Ingen ressourcer synlige</h3>
       <p v-if="hiddenResources.length > 0">
         Alle ressourcer er skjulte. Klik "Gendan Alle" for at få dem tilbage.
@@ -78,6 +87,7 @@
 <script setup>
 import { computed } from 'vue'
 import { defaultResources, categoryOrder } from '../data/resources.js'
+import SkeletonLoader from './SkeletonLoader.vue'
 
 const props = defineProps({
   resources: {
@@ -87,6 +97,10 @@ const props = defineProps({
   hiddenResourceIds: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 })
 

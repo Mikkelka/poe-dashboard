@@ -1,358 +1,151 @@
-# Code Improvement Recommendations
-
-Dette dokument indeholder forslag til forbedringer af PoE Dashboard kodebasen baseret på en grundig analyse af den eksisterende kode.
-
-## 🏗️ Arkitektur og Struktur
-
-### 1. Opdel store komponenter (LØST)
-**Problem:** App.vue er 400+ linjer og indeholder for meget forretningslogik.
-
-**Løsning:**
-- Extrahér state management til en `useBuildsStore` composable
-- Opret en `useAuth` composable til autentificering
-- Opdel App.vue i mindre, fokuserede komponenter
-```javascript
-// Eksempel på composable struktur
-// src/composables/useBuilds.js
-export function useBuilds() {
-  const builds = ref([])
-  const loading = ref(false)
-  // ... builds logik
-  return { builds, loading, addBuild, updateBuild }
-}
-```
-
-### 2. Centraliser styling og tema (LØST)
-**Problem:** Duplikeret CSS på tværs af komponenter.
-
-**Løsning:**
-- Opret `src/styles/variables.css` med CSS custom properties
-- Implementer design tokens for farver, spacing og typografi
-- Brug CSS modules eller scoped styles konsistent
-
-```css
-/* src/styles/variables.css */
-:root {
-  --color-bg-primary: #0f0f0f;
-  --color-bg-secondary: #1a1a1a;
-  --color-border: #333333;
-  --color-text-primary: #e5e5e5;
-  --color-text-secondary: #999999;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-}
-```
-
-## 🔒 Sikkerhed og Environment
-
-### 3. Sikre Firebase konfiguration (LØST)
-**KRITISK:** Firebase API nøgler er eksponeret i klient-koden.
-
-**Løsning:**
-- Flyt følsomme konfigurationer til environment variabler
-- Implementér proper Firebase Security Rules
-- Overvej at bruge Firebase App Check for ekstra sikkerhed
-
-```javascript
-// vite.config.js
-export default defineConfig({
-  plugins: [vue()],
-  define: {
-    'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
-    // ... andre environment variabler
-  }
-})
-```
-
-### 4. Forbedre error handling
-**Problem:** Inconsistent error handling på tværs af applikationen.
-
-**Løsning:**
-- Implementér global error boundary
-- Standardiser error response format
-- Tilføj proper logging system
-
-```javascript
-// src/composables/useErrorHandler.js
-export function useErrorHandler() {
-  const handleError = (error, context) => {
-    console.error(`Error in ${context}:`, error)
-    // Send til logging service
-    // Vis brugervenlig besked
-  }
-  return { handleError }
-}
-```
-
-## ⚡ Performance og Brugeroplevelse
-
-### 5. Implementér loading states
-**Problem:** Manglende eller inconsistente loading indikatorer.
-
-**Løsning:**
-- Standardiser loading patterns
-- Tilføj skeleton loading for bedre UX
-- Implementér optimistic updates hvor relevant
-
-```vue
-<!-- BuildCard.vue med skeleton loading -->
-<template>
-  <div class="build-card">
-    <div v-if="loading" class="skeleton-loader">
-      <div class="skeleton-header"></div>
-      <div class="skeleton-content"></div>
-    </div>
-    <div v-else>
-      <!-- Normal indhold -->
-    </div>
-  </div>
-</template>
-```
-
-### 6. Tilføj offline support
-**Forslag:** Implementér basic offline funktionalitet.
-
-**Løsning:**
-- Tilføj service worker for caching
-- Implementér offline-first data strategi
-- Vis offline status til brugeren
-
-### 7. Forbedre input validation
-**Problem:** Kun basic HTML validation på forms.
-
-**Løsning:**
-- Implementér client-side validation med bibliotek som VeeValidate eller Zod
-- Tilføj real-time validation feedback
-- Standardiser validation patterns
-
-```javascript
-// src/utils/validation.js
-import { z } from 'zod'
-
-export const buildSchema = z.object({
-  buildName: z.string().min(1, 'Build navn er påkrævet').max(100),
-  gameVersion: z.enum(['poe1', 'poe2']),
-  pobLink: z.string().url().optional().or(z.literal('')),
-  // ...
-})
-```
-
-## 🧪 Code Quality og Vedligeholdelse
-
-### 8. Tilføj TypeScript
-**Forslag:** Migrer gradvist til TypeScript for bedre type safety.
-
-**Løsning:**
-- Start med `.ts` filer for utilities og composables
-- Tilføj type definitions for Firebase data models
-- Konfigurér tsconfig.json med strict mode
-
-```typescript
-// src/types/build.ts
-export interface Build {
-  id: string
-  userId: string
-  buildName: string
-  gameVersion: 'poe1' | 'poe2'
-  buildStatus: 'active' | 'paused' | 'completed'
-  // ...
-}
-```
-
-### 9. Implementér testing
-**Problem:** Ingen tests i kodebasen.
-
-**Løsning:**
-- Sæt Vitest op for unit tests
-- Tilføj component tests med Vue Test Utils
-- Implementér e2e tests med Playwright
-
-```javascript
-// tests/components/BuildCard.test.js
-import { mount } from '@vue/test-utils'
-import BuildCard from '@/components/BuildCard.vue'
-
-describe('BuildCard', () => {
-  it('displays build information correctly', () => {
-    const build = { buildName: 'Test Build', gameVersion: 'poe1' }
-    const wrapper = mount(BuildCard, { props: { build } })
-    expect(wrapper.text()).toContain('Test Build')
-  })
-})
-```
-
-### 10. Code linting og formatting
-**Problem:** Ingen synlige linting regler.
-
-**Løsning:**
-- Sæt ESLint op med Vue plugin
-- Konfigurér Prettier for consistent formatting
-- Tilføj pre-commit hooks med husky
-
-```json
-// .eslintrc.js
-module.exports = {
-  extends: [
-    '@vue/eslint-config-typescript',
-    'plugin:vue/vue3-recommended'
-  ],
-  rules: {
-    'vue/no-unused-vars': 'error',
-    'vue/require-v-for-key': 'error'
-  }
-}
-```
-
-## 🎨 UI/UX Forbedringer
-
-### 11. Forbedre accessibility
-**Problem:** Manglende ARIA labels og keyboard navigation.
-
-**Løsning:**
-- Tilføj proper ARIA attributter
-- Implementér keyboard navigation
-- Sørg for god color contrast
-
-```vue
-<template>
-  <button 
-    :aria-label="`Rediger build: ${build.buildName}`"
-    @click="editBuild"
-    @keydown.enter="editBuild"
-  >
-    Rediger
-  </button>
-</template>
-```
-
-### 12. Responsive design forbedringer
-**Problem:** Begrænset responsive design på mobile.
-
-**Løsning:**
-- Implementér mobile-first design approach
-- Tilføj touch gestures for mobile interaction
-- Optimér layout for forskellige skærmstørrelser
-
-### 13. Tilføj animations og transitions
-**Forslag:** Forbedre brugeroplevelsen med smooth animations.
-
-**Løsning:**
-- Tilføj Vue transitions for route changes
-- Implementér micro-animations for user feedback
-- Brug CSS transforms for performance
-
-```vue
-<template>
-  <transition name="fade" mode="out-in">
-    <div :key="activeTab" class="tab-content">
-      <!-- Indhold -->
-    </div>
-  </transition>
-</template>
-
-<style>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-</style>
-```
-
-## 📊 Data Management
-
-### 14. Implementér data caching
-**Forslag:** Reducer Firebase reads med intelligent caching.
-
-**Løsning:**
-- Implementér in-memory cache for frequently accessed data
-- Brug browser localStorage for persistence
-- Implementér cache invalidation strategier
-
-### 15. Batch operations
-**Problem:** Potentielle performance issues med mange Firestore operations.
-
-**Løsning:**
-- Brug Firestore batch writes hvor muligt
-- Implementér bulk operations for data import/export
-- Optimér queries med proper indexing
-
-## 🚀 Deployment og DevOps
-
-### 16. Build optimization
-**Problem:** Standard Vite konfiguration uden optimering.
-
-**Løsning:**
-- Konfigurér code splitting for bedre loading
-- Implementér tree shaking for mindre bundle størrelse
-- Tilføj bundle analyzer
-
-```javascript
-// vite.config.js
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['vue'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore']
-        }
-      }
-    }
-  }
-})
-```
-
-### 17. Environment management
-**Problem:** Manglende separation mellem dev/prod environments.
-
-**Løsning:**
-- Opret separate Firebase projekter for dev/staging/prod
-- Implementér proper CI/CD pipeline
-- Tilføj environment-specific konfiguration
-
-## 📈 Monitoring og Analytics
-
-### 18. Error monitoring
-**Forslag:** Implementér error tracking og performance monitoring.
-
-**Løsning:**
-- Integrér Sentry for error tracking
-- Tilføj Firebase Analytics for usage insights
-- Implementér performance metrics
-
-### 19. User feedback system
-**Forslag:** Tilføj mulighed for bruger feedback.
-
-**Løsning:**
-- Implementér feedback modal eller sidebar
-- Tilføj rating system for builds
-- Opret changelog eller notification system
-
-## 🔄 Prioriteret Implementation Plan
-
-### Fase 1 (Kritisk)
-1. Sikre Firebase konfiguration
-2. Tilføj error handling
-3. Implementér input validation
-
-### Fase 2 (Høj prioritet)
-4. Opdel store komponenter
-5. Tilføj loading states
-6. Implementér linting
-
-### Fase 3 (Medium prioritet)
-7. Tilføj TypeScript
-8. Forbedre responsive design
-9. Implementér testing
-
-### Fase 4 (Lav prioritet)
-10. Offline support
-11. Advanced animations
-12. Performance monitoring
+# POE Dashboard - Forbedringsforslag
+
+Dette dokument indeholder forslag til forbedringer af POE Dashboard applikationen, organiseret efter prioritet og type.
+
+## 🔴 Prioritet 1: Kritiske mangler & sikkerhed
+
+### 1. Slet builds funktionalitet
+**Problem:** Der er ingen måde at slette builds på - kun redigere.
+**Løsning:** Tilføj slet-knap i BuildCard komponenten og implementer slet-funktionalitet i useBuilds composable.
+**Implementering:** Tilføj `deleteDoc` til Firebase operationer og bekræftelses-dialog.
+
+### 2. Input validering forbedringer
+**Problem:** Kun grundlæggende HTML validering på formularer.
+**Løsning:** Implementer client-side validering med fejlmeddelelser på dansk.
+**Implementering:** Tilføj validering for URL formater, obligatoriske felter, og tekstlængder.
+
+### 3. Konsistente loading states
+**Problem:** Inkonsistente loading indikatorer gennem appen.
+**Løsning:** Standardisér loading states og spinners.
+**Implementering:** Opret loading composable og fælles loading komponenter.
+
+### 4. Global fejlhåndtering
+**Problem:** Ingen centraliseret fejlhåndtering.
+**Løsning:** Implementer global error boundary og toast notifikationer.
+**Implementering:** Vue error handler og notification system.
+
+## 🟠 Prioritet 2: Brugeroplevelse forbedringer
+
+### 5. Udvidet søgefunktion
+**Problem:** Søgning dækker kun navn og karakter - ikke noter eller links.
+**Løsning:** Udvid søgning til alle relevante felter.
+**Implementering:** Modificer useSearch composable til at søge i flere felter.
+
+### 6. Bulk operationer
+**Problem:** Ingen måde at vælge og manipulere flere builds samtidig.
+**Løsning:** Tilføj checkbox vælger og batch operationer.
+**Implementering:** Multi-select state og bulk delete/status opdatering.
+
+### 7. Keyboard navigation
+**Problem:** Manglende tastatur tilgængelighed.
+**Løsning:** Implementer tab-navigation og genveje.
+**Implementering:** Tilføj tabindex, focus management og keyboard event handlers.
+
+### 8. Bedre fejlmeddelelser
+**Problem:** Generic fejlmeddelelser på dansk.
+**Løsning:** Specifikke, hjælpsomme fejlmeddelelser.
+**Implementering:** Error mapping med brugervenlige beskeder.
+
+### 9. Tooltips og hjælp
+**Problem:** Ingen forklaringer af felter eller funktioner.
+**Løsning:** Tilføj tooltips og hjælpetekster.
+**Implementering:** Tooltip komponent og hjælpetekst system.
+
+### 10. Bedre mobile oplevelse
+**Problem:** Responsive design kan forbedres på mobile enheder.
+**Løsning:** Optimér touch targets og navigation.
+**Implementering:** Forbedre TailwindCSS mobile breakpoints.
+
+## 🟡 Prioritet 3: Kodekvalitet & performance
+
+### 11. TypeScript migration
+**Problem:** JavaScript uden type sikkerhed.
+**Løsning:** Gradvis migration til TypeScript.
+**Implementering:** Tilføj TypeScript config og migrér komponenter enkeltvis.
+
+### 12. Unit testing
+**Problem:** Ingen test coverage.
+**Løsning:** Implementer Vitest med Vue Test Utils.
+**Implementering:** Test setup og tests for kritiske komponenter og composables.
+
+### 13. Bundle optimering
+**Problem:** Standard Vite config uden optimering.
+**Løsning:** Implementer code splitting og tree shaking.
+**Implementering:** Vite chunks konfiguration og lazy loading af komponenter.
+
+### 14. Performance monitoring
+**Problem:** Ingen indsigt i app performance.
+**Løsning:** Tilføj performance metrics og error tracking.
+**Implementering:** Integration med Firebase Analytics eller Sentry.
+
+### 15. Caching strategi
+**Problem:** Ingen offline support eller caching.
+**Løsning:** Implementer service worker og caching.
+**Implementering:** Workbox for offline functionality.
+
+## 🟢 Prioritet 4: Avancerede features
+
+### 16. Data export/import
+**Problem:** Ingen backup eller migration muligheder.
+**Løsning:** Tilføj JSON export/import af builds.
+**Implementering:** Export til fil og drag-drop import funktionalitet.
+
+### 17. Build templates
+**Problem:** Ingen måde at gemme builds som skabeloner.
+**Løsning:** Template system til genbrugte build setups.
+**Implementering:** Template storage og instansiering af nye builds.
+
+### 18. Statistik dashboard
+**Problem:** Ingen overblik over build trends og statistikker.
+**Løsning:** Dashboard med grafer og metrikker.
+**Implementering:** Chart.js integration med build analytics.
+
+### 19. PWA capabilities
+**Problem:** Ikke installérbar som app.
+**Løsning:** Full PWA implementation.
+**Implementering:** Web app manifest, service worker, og offline functionality.
+
+### 20. Delte builds
+**Problem:** Ingen måde at dele builds med andre brugere.
+**Løsning:** Public build sharing og collaboration.
+**Implementering:** Public links og read-only build visning.
+
+### 21. Notifikationer
+**Problem:** Ingen påmindelser om build updates.
+**Løsning:** Browser notifikationer for guide updates.
+**Implementering:** Push notifications API integration.
+
+### 22. Build sammenligning
+**Problem:** Ingen måde at sammenligne builds.
+**Løsning:** Side-by-side build sammenligning.
+**Implementering:** Comparison view med highlighted forskelle.
+
+### 23. League tracking
+**Problem:** Begrænset league management.
+**Løsning:** Automatisk league detection og arkivering.
+**Implementering:** POE API integration for league information.
+
+### 24. Backup automatisering
+**Problem:** Manuel backup process.
+**Løsning:** Automatisk cloud backup.
+**Implementering:** Scheduled Firebase export eller Google Drive integration.
+
+## 🔧 Implementeringsrækkefølge
+
+1. **Sprint 1:** Kritiske mangler (punkter 1-4)
+2. **Sprint 2:** UX forbedringer (punkter 5-10)  
+3. **Sprint 3:** Kodekvalitet (punkter 11-15)
+4. **Sprint 4:** Avancerede features (punkter 16-24)
+
+## 📋 Noter
+
+- Alle ændringer skal bibeholde dansk sprog interface
+- Firebase Firestore security rules skal opdateres ved nye features
+- TailwindCSS komponent klasser skal bruges konsistent
+- Vue 3 Composition API pattern skal følges
+- Backward compatibility skal bevares hvor muligt
 
 ---
 
-*Generet: {{ new Date().toLocaleDateString('da-DK') }}*
+*Oprettet: August 2025*
+*Sidst opdateret: August 2025*
