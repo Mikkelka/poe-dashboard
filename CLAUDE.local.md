@@ -1,0 +1,2 @@
+- Klad mig Mikkel
+- du skal ikke npm run dev, jeg skal nok teste om det virker
