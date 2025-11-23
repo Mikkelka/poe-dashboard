@@ -133,22 +133,7 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-1.5 mb-5">
-          <label for="notes" class="text-gray-200 text-sm font-medium">Noter</label>
-          <textarea 
-            v-model="formData.notes" 
-            id="notes"
-            rows="3" 
-            placeholder="Ekstra noter om buildet..."
-            @blur="validation.validateField('notes', formData.notes, buildValidationRules.notes.rules, buildValidationRules.notes.displayName)"
-            @input="validation.clearFieldError('notes')"
-            class="bg-slate-900/50 border rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none transition-colors placeholder:text-gray-500 resize-none"
-            :class="validation.hasError('notes') ? 'border-red-500 focus:border-red-400' : 'border-slate-600/50 focus:border-slate-400'"
-          ></textarea>
-          <div v-if="validation.hasError('notes')" class="text-red-400 text-xs mt-1">
-            {{ validation.getError('notes') }}
-          </div>
-        </div>
+
 
         <div v-if="error" class="error-message">
           {{ error }}
@@ -207,8 +192,7 @@ export default {
       buildStatus: 'active',
       guideStatus: 'unknown',
       pobLink: '',
-      guideLink: '',
-      notes: ''
+      guideLink: ''
     }
 
     const formData = reactive({ ...defaultFormData })
@@ -225,8 +209,7 @@ export default {
           buildStatus: newBuild.buildStatus || 'active',
           guideStatus: newBuild.guideStatus || 'unknown',
           pobLink: newBuild.pobLink || '',
-          guideLink: newBuild.guideLink || '',
-          notes: newBuild.notes || ''
+          guideLink: newBuild.guideLink || ''
         })
       } else {
         // Reset form for new build
@@ -320,8 +303,7 @@ export default {
           formData.buildStatus !== (props.editingBuild.buildStatus || 'active') ||
           formData.guideStatus !== (props.editingBuild.guideStatus || 'unknown') ||
           formData.pobLink !== (props.editingBuild.pobLink || '') ||
-          formData.guideLink !== (props.editingBuild.guideLink || '') ||
-          formData.notes !== (props.editingBuild.notes || '')
+          formData.guideLink !== (props.editingBuild.guideLink || '')
         )
       }
       
@@ -332,8 +314,7 @@ export default {
         formData.characterName.trim() !== '' ||
         formData.league.trim() !== '' ||
         formData.pobLink.trim() !== '' ||
-        formData.guideLink.trim() !== '' ||
-        formData.notes.trim() !== ''
+        formData.guideLink.trim() !== ''
       )
     })
 

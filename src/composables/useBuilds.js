@@ -6,9 +6,13 @@ export function useBuilds() {
   const builds = ref([])
   const showModal = ref(false)
   const editingBuild = ref(null)
-  
+
   // Subscription cleanup
   let unsubscribeBuilds = null
+
+  // Notes modal state
+  const showNotesModal = ref(false)
+  const editingNotesBuild = ref(null)
 
   // Modal management
   const openAddBuildModal = () => {
@@ -19,7 +23,15 @@ export function useBuilds() {
   const openEditBuildModal = async (build) => {
     editingBuild.value = build
     showModal.value = true
-    
+
+    // Update last opened timestamp
+    await updateLastOpened(build.id)
+  }
+
+  const openNotesModal = async (build) => {
+    editingNotesBuild.value = build
+    showNotesModal.value = true
+
     // Update last opened timestamp
     await updateLastOpened(build.id)
   }
@@ -27,6 +39,11 @@ export function useBuilds() {
   const closeModal = () => {
     showModal.value = false
     editingBuild.value = null
+  }
+
+  const closeNotesModal = () => {
+    showNotesModal.value = false
+    editingNotesBuild.value = null
   }
 
   const handleBuildSaved = () => {
@@ -42,7 +59,7 @@ export function useBuilds() {
   const handleDeleteBuild = async (buildId, buildName) => {
     // Confirm deletion
     const confirmed = window.confirm(`Er du sikker på, at du vil slette "${buildName}"? Denne handling kan ikke fortrydes.`)
-    
+
     if (!confirmed) {
       return { success: false, error: null }
     }
@@ -65,7 +82,7 @@ export function useBuilds() {
     if (unsubscribeBuilds) {
       unsubscribeBuilds()
     }
-    
+
     if (userId) {
       unsubscribeBuilds = subscribeToUserBuilds(userId, (userBuilds) => {
         builds.value = userBuilds
@@ -94,11 +111,15 @@ export function useBuilds() {
     builds,
     showModal,
     editingBuild,
-    
+    showNotesModal,
+    editingNotesBuild,
+
     // Methods
     openAddBuildModal,
     openEditBuildModal,
+    openNotesModal,
     closeModal,
+    closeNotesModal,
     handleBuildSaved,
     handleLinkClicked,
     handleDeleteBuild,

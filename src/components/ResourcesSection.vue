@@ -50,7 +50,7 @@
               <p class="text-gray-400 text-sm leading-relaxed">{{ resource.description }}</p>
             </div>
             <div class="flex flex-col gap-2 items-end">
-              <a :href="resource.url" target="_blank" class="action-link">
+              <a :href="resource.url" target="_blank" rel="noopener noreferrer" class="action-link">
                 Åbn
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M3.5 3.5L8.5 8.5M8.5 3.5L8.5 8.5L3.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

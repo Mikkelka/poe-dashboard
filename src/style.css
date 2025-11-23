@@ -46,7 +46,7 @@ body {
 }
 
 .container-main {
-  @apply max-w-6xl mx-auto px-6;
+  @apply max-w-[1600px] mx-auto px-6;
 }
 
 .header-full {
@@ -56,7 +56,7 @@ body {
 
 .header-content {
   @apply flex flex-col md:flex-row justify-between items-center 
-         max-w-6xl mx-auto px-4 md:px-6 gap-5 md:gap-0 
+         max-w-[1600px] mx-auto px-4 md:px-6 gap-5 md:gap-0 
          text-center md:text-left;
 }
 
@@ -91,7 +91,7 @@ body {
 
 /* LAYOUT */
 .builds-grid {
-  @apply grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6;
+  @apply grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6;
 }
 
 .section-header {

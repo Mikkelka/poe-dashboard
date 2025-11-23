@@ -85,6 +85,7 @@
               :key="build.id" 
               :build="build"
               @edit-build="openEditBuildModal"
+              @open-notes="openNotesModal"
               @link-clicked="handleLinkClicked"
               @delete-build="handleDeleteBuild"
             />
@@ -115,6 +116,14 @@
       @saved="handleBuildSaved"
     />
 
+    <!-- Notes Modal -->
+    <NotesModal 
+      :show="showNotesModal"
+      :build="editingNotesBuild"
+      @close="closeNotesModal"
+      @saved="handleBuildSaved"
+    />
+
     <!-- Add/Edit Resource Modal -->
     <ResourceModal 
       :show="showResourceModal"
@@ -135,6 +144,7 @@ import { useResources } from './composables/useResources'
 import { useSearch } from './composables/useSearch'
 import { useTab } from './composables/useTab'
 import BuildModal from './components/BuildModal.vue'
+import NotesModal from './components/NotesModal.vue'
 import ResourceModal from './components/ResourceModal.vue'
 import AppHeader from './components/AppHeader.vue'
 import Navigation from './components/Navigation.vue'
@@ -145,6 +155,7 @@ export default {
   name: 'App',
   components: {
     BuildModal,
+    NotesModal,
     ResourceModal,
     AppHeader,
     Navigation,
@@ -205,11 +216,15 @@ export default {
       builds: builds.builds,
       showModal: builds.showModal,
       editingBuild: builds.editingBuild,
+      showNotesModal: builds.showNotesModal,
+      editingNotesBuild: builds.editingNotesBuild,
       openAddBuildModal: builds.openAddBuildModal,
       openEditBuildModal: builds.openEditBuildModal,
+      openNotesModal: builds.openNotesModal,
       handleLinkClicked: builds.handleLinkClicked,
       handleDeleteBuild,
       closeModal: builds.closeModal,
+      closeNotesModal: builds.closeNotesModal,
       handleBuildSaved: builds.handleBuildSaved,
       
       // Search and filtering
